@@ -1,0 +1,756 @@
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+// 定义链接数据类型
+interface LinkItem {
+  id: number;
+  title: string;
+  icon: string;
+  url: string;
+}
+
+// 定义社交媒体链接类型
+interface SocialItem {
+  id: number;
+  icon: string;
+  url: string;
+  name: string;
+}
+
+// 定义名言数据类型
+interface Quote {
+  text: string;
+  author: string;
+}
+
+export default function Home() {
+  // 状态管理
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState('');
+  // 特别鸣谢模态框状态
+  const [isThanksModalOpen, setIsThanksModalOpen] = useState(false);
+  // 学习模态框状态
+  const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
+  const [greeting, setGreeting] = useState('');
+  
+  // 天气数据状态
+  const [weatherData, setWeatherData] = useState<{
+    location: string;
+    temperature: string;
+    condition: string;
+    icon: string;
+  } | null>(null);
+  const [locationError, setLocationError] = useState('');
+
+  // 名言状态
+  const [currentQuote, setCurrentQuote] = useState<Quote>({
+    text: "加载中...",
+    author: "获取名言中"
+  });
+  const [quoteLoading, setQuoteLoading] = useState(true);
+  
+  // 电影模态框状态
+  const [isMovieModalOpen, setIsMovieModalOpen] = useState(false);
+  
+  // 时间胶囊模态框状态
+  const [isTimeCapsuleModalOpen, setIsTimeCapsuleModalOpen] = useState(false);
+  // 实用工具模态框状态
+  const [isUtilityModalOpen, setIsUtilityModalOpen] = useState(false);
+  
+  // 时间进度数据
+  const [timeProgress, setTimeProgress] = useState({
+    daily: 0,
+    weekly: 0,
+    monthly: 0,
+    yearly: 0,
+  });
+
+  // 网站运行时间
+  const siteRuntime = "0天";
+
+      // 获取天气数据 - 使用模拟服务解决CORS问题
+      useEffect(() => {
+        // 获取天气数据
+        const fetchWeatherData = async () => {
+          try {
+            // 显示加载状态
+            setLocationError('获取天气数据中...');
+            
+            // 记录请求URL以便调试
+            console.log('请求天气API:', 'http://v1.yiketianqi.com/free/day?appid=72823321&appsecret=3RlZ2p27&unescape=1');
+            
+            // 发起真实API请求
+            const response = await fetch('http://v1.yiketianqi.com/free/day?appid=72823321&appsecret=3RlZ2p27&unescape=1');
+            
+            // 记录响应状态以便调试
+            console.log('API响应状态:', response.status, response.statusText);
+            const data = await response.json();
+            
+            // 检查API返回的成功状态码
+            if (data && data.code === 200) {
+              // 验证必要字段是否存在
+              if (!data.place || data.temperature === undefined || !data.weather1) {
+                throw new Error('API响应缺少必要字段');
+              }
+              
+              setWeatherData({
+                location: data.place,
+                temperature: `${data.temperature}°C`,
+                condition: data.weather2 ? `${data.weather1}转${data.weather2}` : data.weather1,
+                icon: data.weather1img // 使用API提供的天气图标
+              });
+              setLocationError('');
+            } else {
+              const errorMsg = data?.msg || '未知错误';
+              throw new Error(`获取天气数据失败: ${errorMsg}`);
+            }
+          } catch (error) {
+            // 详细错误信息
+            const errorMessage = error instanceof Error ? error.message : '未知错误';
+            console.error('天气API请求详细错误:', error);
+            setLocationError(`获取失败: ${errorMessage}`);
+            console.error('天气API请求错误:', error);
+            
+            // 显示toast错误提示
+            toast.error(errorMessage, {
+              position: 'bottom-right'
+            });
+          }
+        };
+        
+        // 初始获取
+        fetchWeatherData();
+        
+        // 每30分钟更新一次天气数据
+        const weatherInterval = setInterval(() => fetchWeatherData(), 1800000);
+        
+        return () => clearInterval(weatherInterval);
+      }, []);
+
+  // 本地备份名言，当API不可用时使用
+  const backupQuotes: Quote[] = [
+    { text: "生活就像海洋，只有意志坚强的人才能到达彼岸。", author: "马克思" },
+    { text: "如果冬天来了，春天还会远吗？", author: "雪莱" },
+    { text: "世界上只有一种真正的英雄主义，那就是在认清生活的真相后依然热爱生活。", author: "罗曼·罗兰" },
+    { text: "我们唯一需要恐惧的是恐惧本身。", author: "富兰克林·罗斯福" },
+    { text: "人的价值，在遭受诱惑的一瞬间被决定。", author: "柏拉图" }
+  ];
+
+   // 获取名言数据
+   const fetchQuote = async () => {
+     setQuoteLoading(true);
+     try {
+       // 尝试获取名言API
+       const response = await fetch('https://v.api.aa1.cn/api/yiyan/index.php');
+       
+       // 检查HTTP响应状态
+       if (!response.ok) {
+         throw new Error(`HTTP错误! 状态码: ${response.status}`);
+       }
+       
+       // 先获取响应文本，检查是否为HTML
+       const responseText = await response.text();
+       
+       // 检查是否包含HTML标签
+       if (responseText.includes('<') && responseText.includes('>')) {
+         // 如果是HTML，尝试提取文本内容
+         const tempDiv = document.createElement('div');
+         tempDiv.innerHTML = responseText;
+         const text = tempDiv.textContent?.trim() || '获取名言失败';
+         
+         // 使用提取的文本和备份作者
+         const randomIndex = Math.floor(Math.random() * backupQuotes.length);
+         setCurrentQuote({
+           text: text,
+           author: backupQuotes[randomIndex].author
+         });
+       } else {
+         // 如果不是HTML，尝试解析为JSON
+         try {
+           const data = JSON.parse(responseText);
+           
+           // 验证API响应格式
+           if (!data.hitokoto) {
+             throw new Error("API响应格式不正确");
+           }
+           
+           setCurrentQuote({
+             text: data.hitokoto,
+             author: data.from || '未知作者'
+           });
+         } catch (jsonError) {
+           // JSON解析失败，使用备份名言
+           const randomIndex = Math.floor(Math.random() * backupQuotes.length);
+           setCurrentQuote(backupQuotes[randomIndex]);
+         }
+       }
+     } catch (error) {
+       // 详细错误日志
+       console.error('获取名言失败:', error);
+       
+       // 使用随机本地备份名言
+       const randomIndex = Math.floor(Math.random() * backupQuotes.length);
+       setCurrentQuote(backupQuotes[randomIndex]);
+       
+     } finally {
+       setQuoteLoading(false);
+     }
+   };
+  
+   // 初始获取名言并设置自动刷新
+  useEffect(() => {
+    fetchQuote();
+    
+    // 每30秒自动获取新名言
+     const quoteInterval = setInterval(fetchQuote, 5000);
+    
+    return () => clearInterval(quoteInterval);
+  }, []);
+  
+  // 计算时间进度并设置定时器
+  useEffect(() => {
+    const calculateTimeProgress = () => {
+      const now = new Date();
+      
+      // 今日进度 (0-24小时)
+      const hoursPassed = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+      const dailyProgress = Math.min(Math.round((hoursPassed / 24) * 100), 100);
+      
+      // 本周进度 (0-7天)
+      const dayOfWeek = now.getDay() || 7; // 转换为周一为1，周日为7
+      const weeklyProgress = Math.round((dayOfWeek / 7) * 100);
+      
+      // 本月进度 (0-当月天数)
+      const dayOfMonth = now.getDate();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const monthlyProgress = Math.round((dayOfMonth / daysInMonth) * 100);
+      
+      // 今年进度 (0-12个月)
+      const monthOfYear = now.getMonth() + 1;
+      const yearlyProgress = Math.round((monthOfYear / 12) * 100);
+      
+      setTimeProgress({
+        daily: dailyProgress,
+        weekly: weeklyProgress,
+        monthly: monthlyProgress,
+        yearly: yearlyProgress
+      });
+    };
+    
+    // 初始化计算
+    calculateTimeProgress();
+    
+    // 每分钟更新一次进度
+    const timer = setInterval(calculateTimeProgress, 60000);
+    
+    return () => clearInterval(timer);
+   }, []);
+
+   // 禁用右键菜单功能
+   useEffect(() => {
+     const handleContextMenu = (e: Event) => {
+        e.preventDefault();
+        toast('为优化体验，本站禁用右键', {
+          position: 'bottom-right',
+          className: 'bg-black/80 text-white border-none'
+        });
+     };
+     
+     document.addEventListener('contextmenu', handleContextMenu);
+     return () => {
+       document.removeEventListener('contextmenu', handleContextMenu);
+     };
+   }, []);
+  // 链接数据
+  const links: LinkItem[] = [
+    { id: 1, title: '天气', icon: 'fa-solid fa-cloud-sun', url: 'https://www.msn.cn/zh-cn/weather/forecast/in-%E5%B9%BF%E4%B8%9C%E7%9C%81,%E7%BD%97%E6%B9%96%E5%8C%BA?loc=eyJsIjoi572X5rmW5Yy6IiwiciI6IuW5v%2BS4nOecgSIsImMiOiLkuK3ljY7kurrmsJHlhbHlkozlm70iLCJpIjoiQ04iLCJnIjoiemgtY24iLCJ4IjoiMTE0LjEzMTk4NDkyIiwieSI6IjIyLjU1MDE4MTUifQ%3D%3D&weadegreetype=C&ocid=ansmsnw' },
+    { id: 2, title: '电影', icon: 'fa-solid fa-film', url: '#' },
+    { id: 3, title: '音乐', icon: 'fa-solid fa-music', url: 'https://music.imsyy.com/' },
+     { id: 4, title: '学习', icon: 'fa-solid fa-book', url: '#' },
+      { id: 5, title: '特别鸣谢', icon: 'fa-solid fa-heart', url: '#' },
+       { id: 6, title: '时间胶囊', icon: 'fa-solid fa-hourglass-half', url: '#' },
+       { id: 7, title: '实用工具', icon: 'fa-solid fa-wrench', url: 'https://fly63.com/tool/home.html' },
+  ];
+
+  // 社交媒体数据
+  const socialItems: SocialItem[] = [
+    { id: 1, icon: 'fa-brands fa-github', url: '#', name: 'GitHub' },
+    { id: 2, icon: 'fa-brands fa-twitter', url: '#', name: 'Twitter' },
+    { id: 3, icon: 'fa-brands fa-instagram', url: '#', name: 'Instagram' },
+    { id: 4, icon: 'fa-brands fa-linkedin', url: '#', name: 'LinkedIn' },
+    { id: 5, icon: 'fa-solid fa-envelope', url: '#', name: 'Email' },
+  ];
+
+  // 更新时间和日期
+  useEffect(() => {
+    // 设置初始日期
+    updateDate();
+    
+    // 设置问候语
+    setGreeting(getGreeting());
+    
+    // 更新时间
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    // 更新日期（每天更新一次）
+    const dateTimer = setInterval(() => {
+      updateDate();
+      setGreeting(getGreeting());
+    }, 86400000); // 24小时
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(dateTimer);
+    };
+  }, []);
+
+  // 更新日期函数
+  const updateDate = () => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long'
+    };
+    setCurrentDate(new Date().toLocaleDateString('zh-CN', options));
+  };
+
+  // 获取问候语函数
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 6) return '凌晨好';
+    if (hour < 9) return '早上好';
+    if (hour < 12) return '上午好';
+    if (hour < 14) return '中午好';
+    if (hour < 18) return '下午好';
+    if (hour < 22) return '晚上好';
+    return '夜深了';
+  };
+
+  // 格式化时间显示
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
+
+  return (
+     <div className="min-h-screen flex flex-col relative overflow-hidden">
+       {/* 背景图片 */}
+       <div className="absolute inset-0 z-0">
+            <img 
+     src="https://lf-code-agent.coze.cn/obj/x-ai-cn/268624684546/attachment/20241210m7963n_20250804152700.webp" 
+    alt="Background" 
+            className="w-full h-full object-cover"
+          />
+         {/* 背景渐变覆盖层，增强文字可读性 */}
+         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/70"></div>
+       </div>
+ 
+       {/* 顶部通知栏 */}
+       <div className="relative z-10 bg-black/40 text-white text-sm py-2 px-4 backdrop-blur-md flex justify-center">
+         <span>{greeting}，欢迎来到我的主页</span>
+       </div>
+ 
+       {/* 主内容区 */}
+       <main className="relative z-10 flex-grow container mx-auto px-4 py-12 flex flex-col md:flex-row items-center justify-center md:justify-between max-w-5xl">
+         {/* 左侧：头像和名称 */}
+         <div className="flex flex-col items-center md:items-start mb-10 md:mb-0 md:mr-10">
+           <div className="relative mb-6">
+             <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
+                <img 
+                   src="https://lf-code-agent.coze.cn/obj/x-ai-cn/268624684546/attachment/49a4d7337146cc652592d861806afccf_20250804153303.jpg" 
+                   alt="Avatar" 
+                   className="w-full h-full object-cover rounded-full opacity-80"
+                 />
+             </div>
+           </div>
+             <h1 className="text-3xl md:text-4xl font-light text-white tracking-wider mb-2">lyjy的小站~</h1>
+              <div className="hidden">
+                {/* 已移至顶部的模态框状态 */}
+               const [isThanksModalOpen, setIsThanksModalOpen] = useState(false);
+             </div>
+           
+           {/* 简介/引用区域 */}
+             {/* 名言区域 - 可点击切换 */}
+             <div 
+               className="mt-8 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 max-w-md w-full cursor-pointer hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02]"
+               onClick={fetchQuote}
+               title="点击切换名言"
+             >
+               <p className="text-white/90 text-base md:text-lg italic leading-relaxed">
+                  "{quoteLoading ? '加载中...' : currentQuote.text}"
+                  {quoteLoading && (
+                    <div className="inline-block ml-2 animate-spin">
+                      <i className="fa-solid fa-circle-notch fa-spin"></i>
+                    </div>
+                  )}
+               </p>
+               <p className="text-white/70 text-sm mt-3 text-right">
+                 - {quoteLoading ? '获取中...' : currentQuote.author}
+               </p>
+
+             </div>
+         </div>
+ 
+         {/* 右侧：日期时间和链接 */}
+         <div className="w-full md:w-auto">
+            <div className="grid grid-cols-1 gap-4 mb-8">
+              {/* 日期时间卡片 */}
+              <div className="bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 w-full shadow-md">
+                <p className="text-white/70 text-sm mb-1">{currentDate}</p>
+                <p className="text-white text-3xl font-mono font-light">{formatTime(currentTime)}</p>
+                 {weatherData ? (
+                   <div className="flex items-center text-white/80 text-xs mt-2">
+                    <img src={weatherData.icon} alt={weatherData.condition} className="w-5 h-5 mr-2" />
+                       <span>{weatherData.location} {weatherData.temperature} {weatherData.condition}</span>
+                    </div>
+                 ) : (
+                   <p className="text-white/50 text-xs mt-2">{locationError || '获取天气数据中...'}</p>
+                 )}
+              </div>
+           </div>
+ 
+           {/* 链接卡片网格 */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {links.map(link => (
+                <a 
+                  key={link.id}
+                  href={link.url}
+                  className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105 ${link.id === 2 ? 'cursor-pointer' : ''}`}
+                   aria-label={link.title}
+                     onClick={(e) => {
+                       e.preventDefault();
+                       if (link.id === 2) {
+                         setIsMovieModalOpen(true);
+                       } else if (link.id === 4) {
+                         setIsStudyModalOpen(true);
+                       } else if (link.id === 5) {
+                         setIsThanksModalOpen(true);
+                        } else if (link.id === 6) {
+                           setIsTimeCapsuleModalOpen(true);
+                        } else if (link.id === 7) {
+                           setIsUtilityModalOpen(true);
+                       }
+                    }}
+                >
+                  <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
+                  <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
+                </a>
+              ))}
+            </div>
+            
+            {/* 电影网站选择模态框 */}
+            {isMovieModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                {/* 背景遮罩 */}
+                <div 
+                  className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                  onClick={() => setIsMovieModalOpen(false)}
+                ></div>
+                
+                {/* 模态框内容 */}
+                <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-white text-xl font-semibold">选择电影网站</h3>
+                    <button 
+                      onClick={() => setIsMovieModalOpen(false)}
+                      className="text-white/60 hover:text-white transition-colors"
+                    >
+                      <i className="fa-solid fa-times text-lg"></i>
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <a 
+                      href="https://jpyy.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
+                      onClick={() => setIsMovieModalOpen(false)}
+                    >
+                      <i className="fa-solid fa-film mr-2"></i>jpyy.com
+                    </a>
+                    
+                    <a 
+                      href="https://ixkw.cc" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
+                      onClick={() => setIsMovieModalOpen(false)}
+                    >
+                      <i className="fa-solid fa-video mr-2"></i>ixkw.cc
+                    </a>
+                  </div>
+                  
+                  <p className="text-white/40 text-xs text-center mt-6">
+                    点击外部区域或关闭按钮也可关闭
+                  </p>
+                </div>
+              </div>
+            )}
+         </div>
+         
+
+         {/* 特别鸣谢模态框 */}
+         {isThanksModalOpen && (
+           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+             {/* 背景遮罩 */}
+             <div 
+               className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+               onClick={() => setIsThanksModalOpen(false)}
+             ></div>
+             
+             {/* 模态框内容 */}
+             <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl">
+               <div className="flex justify-between items-center mb-6">
+                 <h3 className="text-white text-xl font-semibold">特别鸣谢</h3>
+                 <button 
+                   onClick={() => setIsThanksModalOpen(false)}
+                   className="text-white/60 hover:text-white transition-colors"
+                   aria-label="关闭"
+                 >
+                   <i className="fa-solid fa-times text-lg"></i>
+                 </button>
+               </div>
+               
+               <div className="space-y-4 text-white">
+                 <div>
+                   <p className="text-white/90 mb-2">个人空间网：</p>
+                   <a href="http://gerenzhuye.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">gerenzhuye.com</a>
+                 </div>
+                 
+                 <div>
+                   <p className="text-white/90 mb-2">扣子空间：</p>
+                   <a href="https://space.coze.cn/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">https://space.coze.cn/</a>
+                 </div>
+                 
+                 <div>
+                   <p className="text-white/90 mb-2">imsyy：</p>
+                   <div className="flex flex-col space-y-1">
+                     <a href="https://www.imsyy.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">https://www.imsyy.com/</a>
+                     <a href="https://music.imsyy.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">https://music.imsyy.com/</a>
+                   </div>
+                 </div>
+               </div>
+               
+               <p className="text-white/40 text-xs text-center mt-6">
+                 点击外部区域或关闭按钮可关闭
+               </p>
+             </div>
+           </div>
+         )}
+
+          {/* 学习模态框 */}
+          {isStudyModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              {/* 背景遮罩 */}
+              <div 
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setIsStudyModalOpen(false)}
+              ></div>
+              
+              {/* 模态框内容 */}
+              <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-white text-xl font-semibold">学习资源</h3>
+                  <button 
+                    onClick={() => setIsStudyModalOpen(false)}
+                    className="text-white/60 hover:text-white transition-colors"
+                    aria-label="关闭"
+                  >
+                    <i className="fa-solid fa-times text-lg"></i>
+                  </button>
+                </div>
+                
+                <div className="space-y-4 text-white">
+                  <div>
+                    <p className="text-white/90 mb-2">函数计算器：</p>
+                    <a href="https://www.desmos.com/calculator?lang=zh-CN" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">
+                      https://www.desmos.com/calculator?lang=zh-CN
+                    </a>
+                  </div>
+                  
+                  <div>
+                    <p className="text-white/90 mb-2">有道翻译：</p>
+                    <a href="https://fanyi.youdao.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">
+                      https://fanyi.youdao.com/
+                    </a>
+                  </div>
+                  
+                  <div>
+                    <p className="text-white/90 mb-2">豆包AI：</p>
+                    <a href="https://www.doubao.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm break-all">
+                      www.doubao.com
+                    </a>
+                  </div>
+                </div>
+                
+                <p className="text-white/40 text-xs text-center mt-6">
+                  点击外部区域或关闭按钮可关闭
+                </p>
+              </div>
+            </div>
+          )}
+          {/* 时间胶囊模态框 */}
+          {isTimeCapsuleModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              {/* 背景遮罩 */}
+              <div 
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setIsTimeCapsuleModalOpen(false)}
+              ></div>
+              
+              {/* 模态框内容 */}
+              <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-white text-xl font-semibold">时间胶囊</h3>
+                  <button 
+                    onClick={() => setIsTimeCapsuleModalOpen(false)}
+                    className="text-white/60 hover:text-white transition-colors"
+                    aria-label="关闭"
+                  >
+                    <i className="fa-solid fa-times text-lg"></i>
+                  </button>
+                </div>
+                
+                <div className="space-y-6 text-white">
+                  <div>
+                    <p className="text-white/90 mb-2">今日已经度过了 {Math.floor(currentTime.getHours())} 小时</p>
+                    <div className="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                      <div 
+                        className="bg-blue-500 h-2.5 rounded-full" 
+                        style={{ width: `${timeProgress.daily}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-right text-sm text-white/70">{timeProgress.daily}%</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-white/90 mb-2">本周已经度过了 {currentTime.getDay() || 7} 天</p>
+                    <div className="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                      <div 
+                        className="bg-blue-500 h-2.5 rounded-full" 
+                        style={{ width: `${timeProgress.weekly}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-right text-sm text-white/70">{timeProgress.weekly}%</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-white/90 mb-2">本月已经度过了 {currentTime.getDate()} 天</p>
+                    <div className="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                      <div 
+                        className="bg-blue-500 h-2.5 rounded-full" 
+                        style={{ width: `${timeProgress.monthly}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-right text-sm text-white/70">{timeProgress.monthly}%</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-white/90 mb-2">今年已经度过了 {currentTime.getMonth() + 1} 个月</p>
+                    <div className="w-full bg-white/10 rounded-full h-2.5 mb-1">
+                      <div 
+                        className="bg-blue-500 h-2.5 rounded-full" 
+                        style={{ width: `${timeProgress.yearly}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-right text-sm text-white/70">{timeProgress.yearly}%</p>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-white/10">
+                    <p className="text-white/90">本站已经运行了 {siteRuntime}</p>
+                  </div>
+                </div>
+                
+                <p className="text-white/40 text-xs text-center mt-6">
+                  点击外部区域或关闭按钮可关闭
+                </p>
+              </div>
+            </div>
+          )}
+          
+           {/* 实用工具模态框 */}
+           {isUtilityModalOpen && (
+             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+               {/* 背景遮罩 */}
+               <div 
+                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                 onClick={() => setIsUtilityModalOpen(false)}
+               ></div>
+               
+               {/* 模态框内容 */}
+               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-2xl">
+                 <div className="flex justify-between items-center mb-6">
+                   <h3 className="text-white text-xl font-semibold">实用工具</h3>
+                   <button 
+                     onClick={() => setIsUtilityModalOpen(false)}
+                     className="text-white/60 hover:text-white transition-colors"
+                     aria-label="关闭"
+                   >
+                     <i className="fa-solid fa-times text-lg"></i>
+                   </button>
+                 </div>
+                 
+                 <div className="space-y-4">
+                   <a 
+                     href="https://unitools.fun/#categoryCode=image" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
+                     onClick={() => setIsUtilityModalOpen(false)}
+                   >
+                     <i className="fa-solid fa-image mr-2"></i>unitools.fun (图片工具)
+                   </a>
+                   
+                   <a 
+                     href="https://fly63.com/tool/home.html" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
+                     onClick={() => setIsUtilityModalOpen(false)}
+                   >
+                     <i className="fa-solid fa-wrench mr-2"></i>fly63.com (实用工具)
+                   </a>
+                 </div>
+                 
+                 <p className="text-white/40 text-xs text-center mt-6">
+                   点击外部区域或关闭按钮也可关闭
+                 </p>
+               </div>
+             </div>
+           )}
+           
+           </main>
+ 
+       {/* 底部社交链接 */}
+       <footer className="relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm">
+         <div className="container mx-auto flex justify-center space-x-6">
+            {socialItems.map(item => (
+              <a 
+                key={item.id}
+                href={item.url}
+                className="text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
+                aria-label={item.name}
+                onClick={(e) => {
+                  e.preventDefault();
+                  toast('你的权限不足，暂时无法访问，感谢您的使用', {
+                    position: 'bottom-right',
+                    className: 'bg-black/80 text-white border-none'
+                  });
+                }}
+              >
+                <i className={item.icon}></i>
+              </a>
+            ))}
+         </div>
+       </footer>
+     </div>
+   );
+}
