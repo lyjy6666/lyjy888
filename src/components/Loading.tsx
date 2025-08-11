@@ -28,10 +28,15 @@ const Loading = () => {
         transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
       >
         <div className="w-16 h-16 border-4 border-white/20 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-white/60 text-sm flex items-center">
-          <span className="mr-2">加载中</span>
-          <span className="animate-pulse">●●●</span>
-        </p>
+        <div className="text-center">
+          <p className="text-white/60 text-sm mb-2">
+            <span className="mr-2">加载中</span>
+            <span className="animate-pulse">●●●</span>
+          </p>
+          <p className="text-white/40 text-xs">
+            为了您的浏览体验，手机端用户请前往电脑端访问，如果加载失败请刷新
+          </p>
+        </div>
       </motion.div>
       
       {/* 底部装饰元素 */}

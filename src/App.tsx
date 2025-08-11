@@ -17,7 +17,7 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500); // 1.5秒加载时间，可根据需要调整
+    }, 3500); // 3.5秒加载时间，增加了2秒
 
     return () => clearTimeout(timer);
   }, []);

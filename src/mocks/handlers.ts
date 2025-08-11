@@ -12,7 +12,7 @@ const mockWeatherData = {
   "windScale": "微风",
   "feelst": 30.1,
   "code": 200,
-  "place": "中国, 广东, 深圳",
+"place": "深圳",
   "weather1": "晴",
   "weather2": "多云",
   "weather1img": "https://rescdn.apihz.cn/resimg/tianqi/qing.png",

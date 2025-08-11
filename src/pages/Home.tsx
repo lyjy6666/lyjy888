@@ -33,17 +33,11 @@ export default function Home() {
   // 学习模态框状态
    const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
 
-   const [greeting, setGreeting] = useState('');
+  const [greeting, setGreeting] = useState('');
   
-  // 天气数据状态
-  const [weatherData, setWeatherData] = useState<{
-    location: string;
-    temperature: string;
-    condition: string;
-    icon: string;
-  } | null>(null);
-  const [locationError, setLocationError] = useState('');
-  const [lastUpdated, setLastUpdated] = useState('');
+
+ 
+
 
   // 名言状态
   const [currentQuote, setCurrentQuote] = useState<Quote>({
@@ -61,13 +55,15 @@ export default function Home() {
    const [isAIToolsModalOpen, setIsAIToolsModalOpen] = useState(false);
    // 其他功能模态框状态
    const [isOtherModalOpen, setIsOtherModalOpen] = useState(false);
-   // 实用工具模态框状态
-    const [isUtilityModalOpen, setIsUtilityModalOpen] = useState(false);
-     // 意见反馈弹窗状态
-     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-     // 传送门警告弹窗状态
-     const [isPortalWarningOpen, setIsPortalWarningOpen] = useState(false);
-     // 传送门倒计时
+  // 实用工具模态框状态
+  const [isUtilityModalOpen, setIsUtilityModalOpen] = useState(false);
+   // 意见反馈弹窗状态
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  // 传送门警告弹窗状态
+  const [isPortalWarningOpen, setIsPortalWarningOpen] = useState(false);
+  // 更新日志弹窗状态
+  const [isUpdateLogOpen, setIsUpdateLogOpen] = useState(false);
+  // 传送门倒计时
       const [portalCountdown, setPortalCountdown] = useState(10);
   
   // 时间进度数据
@@ -90,83 +86,7 @@ export default function Home() {
    
    const siteRuntime = calculateSiteRuntime();
 
-      // 获取天气数据 - 使用模拟服务解决CORS问题
-      useEffect(() => {
-        // 获取天气数据
-        const fetchWeatherData = async () => {
-          try {
-            // 显示加载状态
-            setLocationError('获取天气数据中...');
-            
-            // 记录请求URL以便调试
-            console.log('请求天气API:', 'http://v1.yiketianqi.com/free/day?appid=72823321&appsecret=3RlZ2p27&unescape=1');
-            
-            // 发起真实API请求
- const response = await fetch('https://api.seniverse.com/v3/weather/daily.json?key=Sp4zuknePm2TtLYTM&location=shenzhen&language=zh-Hans&unit=c&start=0&days=1');
-             
-             // 记录响应状态以便调试
-             console.log('API响应状态:', response.status, response.statusText);
-             
-             // 解析响应数据
-             const result = await response.json();
-             
-             // 检查API返回的成功状态码
-             if (response.ok) {
-               // 验证必要字段是否存在
-               if (!result.results || result.results.length === 0 || !result.results[0].daily || result.results[0].daily.length === 0) {
-                 throw new Error('API响应格式不正确');
-               }
-               
-               const dailyData = result.results[0].daily[0];
-               const location = result.results[0].location;
-               
-                // 解析地区信息
-                const locationParts = location.path.split(',');
-                const province = locationParts.length > 2 ? locationParts[2] : '';
-                
-                setWeatherData({
-                  location: `${location.country} ${province} ${location.name}`,
-                  temperature: `${dailyData.low}°C ~ ${dailyData.high}°C`,
-                  condition: dailyData.text_day,
-                  icon: `https://cdn.seniverse.com/weather/icon/png/2d/blue/${dailyData.code_day}.png`
-                });
-                // 更新最后更新时间
-                const now = new Date();
-                setLastUpdated(now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }));
-               setLocationError('');
-             } else {
-               const errorMsg = result?.msg || '未知错误';
-               throw new Error(`获取天气数据失败: ${errorMsg}`);
-             }
-          } catch (error) {
-            // 详细错误信息
-             const errorMessage = error instanceof Error ? error.message : '未知错误';
-            console.error('天气API请求详细错误:', error);
-            // 使用模拟数据作为 fallback
-            setWeatherData({
-              location: '中国 广东 深圳',
-              temperature: '26°C ~ 32°C',
-              condition: '多云',
-              icon: 'https://cdn.seniverse.com/weather/icon/png/2d/blue/10n.png'
-            });
-            setLocationError(`获取失败: ${errorMessage}`);
-            console.error('天气API请求错误:', error);
-            
-            // 显示toast错误提示
-            toast.error(errorMessage, {
-              position: 'bottom-right'
-            });
-          }
-        };
-        
-        // 初始获取
-        fetchWeatherData();
-        
-        // 每30分钟更新一次天气数据
-        const weatherInterval = setInterval(() => fetchWeatherData(), 1800000);
-        
-        return () => clearInterval(weatherInterval);
-      }, []);
+
 
   // 本地备份名言，当API不可用时使用
   const backupQuotes: Quote[] = [
@@ -465,8 +385,7 @@ export default function Home() {
              <h1 className="text-3xl md:text-4xl font-light text-white tracking-wider mb-2">lyjy的小站~</h1>
               <div className="hidden">
                 {/* 已移至顶部的模态框状态 */}
-               const [isThanksModalOpen, setIsThanksModalOpen] = useState(false);
-             </div>
+              </div>
            
            {/* 简介/引用区域 */}
              {/* 名言区域 - 可点击切换 */}
@@ -497,14 +416,7 @@ export default function Home() {
               <div className="bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 w-full shadow-md">
                 <p className="text-white/70 text-sm mb-1">{currentDate}</p>
                 <p className="text-white text-3xl font-mono font-light">{formatTime(currentTime)}</p>
-                 {weatherData ? (
-                   <div className="flex items-center text-white/80 text-xs mt-2">
-                     <img src={weatherData.icon} alt={weatherData.condition} className="w-6 h-6 mr-2" />
-                       <span>{weatherData.location} {weatherData.temperature} {weatherData.condition}</span>
-                    </div>
-                 ) : (
-                   <p className="text-white/50 text-xs mt-2">{locationError || '获取天气数据中...'}</p>
-                 )}
+
               </div>
            </div>
  
@@ -514,29 +426,32 @@ export default function Home() {
                 <a 
                   key={link.id}
                   href={link.url}
-                  className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105 ${link.id === 2 ? 'cursor-pointer' : ''}`}
+                   className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
                     aria-label={link.title}
                       onClick={(e) => {
                         e.preventDefault();
-                        if (link.id === 2) {
+                        if (link.id === 1 || link.id === 3) {
+                          // 天气和音乐按钮在新标签页打开
+                          window.open(link.url, '_blank');
+                        } else if (link.id === 2) {
                           setIsMovieModalOpen(true);
                         } else if (link.id === 4) {
                            setIsStudyModalOpen(true);
-                          } else if (link.id === 7) {
-                             setIsUtilityModalOpen(true);
-                         } else if (link.id === 8) {
-                             setIsAIToolsModalOpen(true);
-                         } else if (link.id === 6) {
-                             // 打开时间胶囊模态框
-                             setIsTimeCapsuleModalOpen(true);
-                         } else if (link.id === 9) {
-                             // 打开传送门警告弹窗
-                             setIsPortalWarningOpen(true);
-                         } else if (link.id === 10) {
-                             // 打开"其他"功能模态框
-                             setIsOtherModalOpen(true);
-                         }
-                     }}
+                         } else if (link.id === 7) {
+                            setIsUtilityModalOpen(true);
+                        } else if (link.id === 8) {
+                            setIsAIToolsModalOpen(true);
+                        } else if (link.id === 6) {
+                            // 打开时间胶囊模态框
+                            setIsTimeCapsuleModalOpen(true);
+                        } else if (link.id === 9) {
+                            // 打开传送门警告弹窗
+                            setIsPortalWarningOpen(true);
+                        } else if (link.id === 10) {
+                            // 打开"其他"功能模态框
+                            setIsOtherModalOpen(true);
+                        }
+                    }}
                 >
                   <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
                   <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
@@ -565,35 +480,132 @@ export default function Home() {
                     </button>
                   </div>
                   
-                  <div className="space-y-4">
-                    <a 
-                      href="https://jpyy.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                      onClick={() => setIsMovieModalOpen(false)}
-                    >
-                      <i className="fa-solid fa-film mr-2"></i>jpyy.com
-                    </a>
-                    
-                    <a 
-                      href="https://ixkw.cc" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                      onClick={() => setIsMovieModalOpen(false)}
-                    >
-                      <i className="fa-solid fa-video mr-2"></i>ixkw.cc
-                    </a>
-                  </div>
+                     <div className="space-y-4">
+                       <a 
+                         href="https://jpyy.com" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                         onClick={() => setIsMovieModalOpen(false)}
+                       >
+                         <i className="fa-solid fa-film mr-2"></i>金牌影院（微卡，但无广）
+                       </a>
+                       
+                       <a 
+                         href="https://ixkw.cc" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                         onClick={() => setIsMovieModalOpen(false)}
+                       >
+                         <i className="fa-solid fa-video mr-2"></i>星空影院（不卡，但视频中有广）
+                       </a>
+                     </div>
                   
                   <p className="text-white/40 text-xs text-center mt-6">
                     点击外部区域或关闭按钮也可关闭
                   </p>
                 </div>
               </div>
-            )}
-         </div>
+              )}
+
+              {/* 更新日志弹窗 */}
+              {isUpdateLogOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  {/* 背景遮罩 */}
+                  <div 
+                    className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                    onClick={() => setIsUpdateLogOpen(false)}
+                  ></div>
+                  
+                  {/* 弹窗内容 */}
+                  <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden">
+                    {/* 标题栏 */}
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-800">更新日志</h3>
+                      <button 
+                        onClick={() => setIsUpdateLogOpen(false)}
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                        aria-label="关闭"
+                      >
+                        <i className="fa-solid fa-times"></i>
+                      </button>
+                    </div>
+                    
+                    {/* 内容区域 */}
+                    <div className="p-6 max-h-[60vh] overflow-y-auto">
+                      {/* 最新更新 */}
+                      <div className="mb-8">  
+                        <div className="flex items-center mb-3">
+                          <div className="w-3 h-10 bg-blue-500 rounded-l mr-4"></div>
+                          <h4 className="text-lg font-semibold text-gray-800">2025.8.11 更新 v2.1</h4>
+                        </div>
+                        <ul className="ml-7 space-y-2 text-gray-600">
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>ai功能ui界面大调整</span>
+                          </li>
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>页面更加美观</span>
+                          </li>
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>修复了一些已知问题，提升体验感</span>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      {/* 历史更新 */}
+                      <div className="mb-8">  
+                        <div className="flex items-center mb-3">
+                          <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
+                          <h4 className="text-lg font-semibold text-gray-800">2025.8.6 更新 v2.0</h4>
+                        </div>
+                        <ul className="ml-7 space-y-2 text-gray-600">
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>新增传送门等功能</span>
+                          </li>
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>我的搜索页也上线啦，新增跳转搜索页按钮</span>
+                          </li>
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>修复了一些已知问题</span>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      {/* 初始版本 */}
+                      <div>  
+                        <div className="flex items-center mb-3">
+                          <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
+                          <h4 className="text-lg font-semibold text-gray-800">2025.8.4 发布 v1.0</h4>
+                        </div>
+                        <ul className="ml-7 space-y-2 text-gray-600">
+                          <li className="flex items-start">
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <span>网站上线啦</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    {/* 底部按钮 */}
+                    <div className="p-4 border-t border-gray-200 flex justify-end">
+                      <button 
+                        onClick={() => setIsUpdateLogOpen(false)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                      >
+                        我知道了
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+    </div>
          
 
           {/* 其他功能模态框 */}
@@ -605,7 +617,7 @@ export default function Home() {
                 onClick={() => setIsOtherModalOpen(false)}
               ></div>
               
-              {/* 模态框内容 */}
+              {/* Modal content */}
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-white text-xl font-semibold">其他功能</h3>
@@ -655,11 +667,9 @@ export default function Home() {
                     </div>
                   </div>
                   
-
                 </div>
                 
                 <p className="text-white/40 text-xs text-center mt-6">
-
                    点击外部区域或关闭按钮可关闭
                  </p>
                </div>
@@ -689,35 +699,25 @@ export default function Home() {
                 </div>
                 
                     <div className="space-y-4">
+                        <a 
+                          href="https://calc.kafuchino.top/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                          onClick={() => setIsStudyModalOpen(false)}
+                        >
+                          <i className="fa-solid fa-calculator mr-2"></i>函数计算器
+                       </a>
+                       
                        <a 
-                         href="https://calc.kafuchino.top/" 
+                         href="https://fanyi.youdao.com/" 
                          target="_blank" 
                          rel="noopener noreferrer"
-                         className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
+                         className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
                          onClick={() => setIsStudyModalOpen(false)}
                        >
-                         <i className="fa-solid fa-calculator mr-2"></i>函数计算器
-                      </a>
-                      
-                      <a 
-                        href="https://fanyi.youdao.com/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                        onClick={() => setIsStudyModalOpen(false)}
-                      >
-                        <i className="fa-solid fa-language mr-2"></i>有道翻译
-                      </a>
-                      
-                      <a 
-                        href="https://www.doubao.com" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                        onClick={() => setIsStudyModalOpen(false)}
-                      >
-                        <i className="fa-solid fa-robot mr-2"></i>豆包AI
-                      </a>
+                         <i className="fa-solid fa-language mr-2"></i>有道翻译
+                       </a>
                     </div>
                 
                 <p className="text-white/40 text-xs text-center mt-6">
@@ -885,7 +885,7 @@ export default function Home() {
                 ></div>
                 
                 {/* 模态框内容 */}
-                <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-2xl">
+                    <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-6 w-full max-w-4xl shadow-2xl">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-white text-xl font-semibold">AI工具</h3>
                     <button 
@@ -896,88 +896,96 @@ export default function Home() {
                       <i className="fa-solid fa-times text-lg"></i>
                     </button>
                   </div>
-                  
-                       <div className="space-y-6">
-                          <div className="text-white text-lg font-medium mb-2">推荐</div>
-                          <div className="space-y-4">
-                            <a 
-                              href="https://www.doubao.com" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                              onClick={() => setIsAIToolsModalOpen(false)}
-                              title="豆包AI"
-                            >
-                              <i className="fa-solid fa-robot mr-2"></i>豆包
-                            </a>
-                            
-                            <a 
-                              href="https://space.coze.cn" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                              onClick={() => setIsAIToolsModalOpen(false)}
-                              title="扣子空间"
-                            >
-                              <i className="fa-solid fa-cube mr-2"></i>扣子
-                            </a>
-                            
-                            <a 
-                              href="https://www.trae.cn" 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-                              onClick={() => setIsAIToolsModalOpen(false)}
-                              title="TRAE"
-                            >
-                              <i className="fa-solid fa-cogs mr-2"></i>TRAE
-                            </a>
-                            
-                             <a 
-  href="https://www.tongyi.com" 
-  target="_blank" 
-  rel="noopener noreferrer"
-  className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-  onClick={() => setIsAIToolsModalOpen(false)}
-  title="通义千问"
->
-  <i className="fa-solid fa-comment-dots mr-2"></i>通义千问
-</a>
+                   
+                  <div className="space-y-6">
+                    <div className="text-white text-lg font-medium mb-2">推荐</div>
+                     <div className="space-y-2">
+                       <a 
+                         href="https://www.doubao.com" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
+                         onClick={() => setIsAIToolsModalOpen(false)}
+                         title="豆包AI"
+                       >
+                          <i className="fa-solid fa-robot mr-3"></i>豆包（日常完全够用，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
+                       </a>
+                       
+                       <a 
+                         href="https://www.tongyi.com" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
+                         onClick={() => setIsAIToolsModalOpen(false)}
+                         title="通义千问"
+                       >                        
+                          <i className="fa-solid fa-comment-dots mr-3"></i>通义千问（日常也够用，模型多，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
+                       </a>
+                       
+                       <a 
+                         href="https://space.coze.cn" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
+                         onClick={() => setIsAIToolsModalOpen(false)}
+                         title="扣子空间"
+                       >
+                          <i className="fa-solid fa-cube mr-3"></i>扣子（较高难度需要用到，有很多ai专家和插件，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
+                       </a>
+                       
+                       <a 
+                         href="https://www.trae.cn" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
+                         onClick={() => setIsAIToolsModalOpen(false)}
+                         title="TRAE"
+                       >
+                          <i className="fa-solid fa-cogs mr-3"></i>trae（编程专用，但效果好，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
+                       </a>
 
-<div className="text-center text-white/70 text-sm py-1">不太推荐</div>
+                       <a 
+                         href="https://www.haisnap.com" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
+                         onClick={() => setIsAIToolsModalOpen(false)}
+                         title="haisnap"
+                       >
+                          <i className="fa-solid fa-code mr-3"></i>haisnap（基本主要与编程有关，测试阶段，进阶版进群获得，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
+                       </a>
 
-<a 
-  href="https://www.deepseek.com" 
-  target="_blank" 
-  rel="noopener noreferrer"
-  className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium opacity-50 cursor-not-allowed"
-  title="DeepSeek (已禁用)"
->
-  <i className="fa-solid fa-microchip mr-2"></i>DeepSeek (错误率极高)
-                            </a>
-                            
-                             <a 
-                               href="https://chatgpt.com" 
-                               target="_blank" 
-                               rel="noopener noreferrer"
-                              className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium opacity-50"
-                              title="ChatGPT"
-                            >
-                              <i className="fa-solid fa-brain mr-2"></i>ChatGPT (需要**上网嘿嘿)
-                             </a>
-                             
+                        <div className="text-white text-lg font-medium mb-2">不太推荐</div>
 
-                          </div>
-                        </div>
-                  
-                  <p className="text-white/40 text-xs text-center mt-6">
-                    点击外部区域或关闭按钮可关闭
-                  </p>
+                       <a 
+                         href="https://www.deepseek.com" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50 cursor-not-allowed"
+                         title="DeepSeek"
+                       >
+                          <i className="fa-solid fa-microchip mr-3"></i>DeepSeek（错误多，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
+                       </a>
+                       
+                       <a 
+                         href="https://chatgpt.com" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50"
+                         title="ChatGPT"
+                       >
+                          <i className="fa-solid fa-brain mr-3"></i>ChatGPT（需要魔法嘿嘿，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
+                       </a>
+                     </div>
+                  </div>
                 </div>
               </div>
             )}
             
-             </main>
+              </main>
+
+              {/* 左下角版本号 */}
+  <div className="fixed bottom-6 left-6 text-orange-300 text-4xl font-bold transform -rotate-12 z-20">v2.1</div>
 
             {/* 意见反馈弹窗 */}
             {isFeedbackModalOpen && (
@@ -1018,8 +1026,8 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-             )}
-             
+            )}
+            
              {/* 传送门警告弹窗 */}
              {isPortalWarningOpen && (
                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1074,27 +1082,36 @@ export default function Home() {
              )}
    
          {/* 底部社交链接 */}
-         <footer className="relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm">
-         <div className="container mx-auto flex justify-center space-x-6">
-            {socialItems.map(item => (
-              <a 
-                key={item.id}
-                href={item.url}
-                className="text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
-                aria-label={item.name}
-                onClick={(e) => {
-                  e.preventDefault();
-toast('此功能即将上线，感谢您的使用', {
-        position: 'bottom-right',
-        className: 'bg-black/80 text-white border-none'
-                  });
-                }}
-              >
-                <i className={item.icon}></i>
-              </a>
-            ))}
-      </div>
-      
+          {/* 更新日志按钮 - 右下角固定位置 */}
+          <button 
+            onClick={() => setIsUpdateLogOpen(true)}
+            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110"
+            aria-label="查看更新日志"
+          >
+            <i className="fa-solid fa-history"></i>
+          </button>
+
+          <footer className="relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm">
+          <div className="container mx-auto flex justify-center space-x-6">
+             {socialItems.map(item => (
+               <a 
+                 key={item.id}
+                 href={item.url}
+                 className="text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
+                 aria-label={item.name}
+                 onClick={(e) => {
+                   e.preventDefault();
+ toast('此功能即将上线，感谢您的使用', {
+         position: 'bottom-right',
+         className: 'bg-black/80 text-white border-none'
+                   });
+                 }}
+               >
+                 <i className={item.icon}></i>
+               </a>
+             ))}
+       </div>
+       
 
        </footer>
      </div>
