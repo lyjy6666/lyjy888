@@ -14,20 +14,17 @@ const Footer = () => {
             <p className="text-gray-400 mb-6 max-w-md">
               一名充满热情的前端开发者，专注于构建美观、高效且用户友好的数字体验。
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa-brands fa-github"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa-brands fa-linkedin"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa-brands fa-twitter"></i>
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <i className="fa-brands fa-dribbble"></i>
-              </a>
-            </div>
+        <div className="flex space-x-4">
+           <a href="https://github.com/lyjy6666" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="GitHub">
+            <i className="fa-brands fa-github"></i>
+          </a>
+          <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="抖音">
+            <i className="fa-brands fa-tiktok"></i>
+          </a>
+           <a href="https://space.bilibili.com/1983970346?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="bilibili">
+            <i className="fa-brands fa-bilibili"></i>
+          </a>
+        </div>
           </div>
           <div>
             <h4 className="text-lg font-semibold mb-4">快速链接</h4>

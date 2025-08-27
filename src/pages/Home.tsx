@@ -33,6 +33,8 @@ export default function Home() {
   // 学习模态框状态
    const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
 
+
+
   const [greeting, setGreeting] = useState('');
   
 
@@ -64,7 +66,9 @@ export default function Home() {
   // 更新日志弹窗状态
   const [isUpdateLogOpen, setIsUpdateLogOpen] = useState(false);
   // 传送门倒计时
-      const [portalCountdown, setPortalCountdown] = useState(10);
+  const [portalCountdown, setPortalCountdown] = useState(10);
+  
+
   
   // 时间进度数据
   const [timeProgress, setTimeProgress] = useState({
@@ -253,26 +257,58 @@ export default function Home() {
    };
    
    // 链接数据
-     const links: LinkItem[] = [
-       { id: 1, title: '天气', icon: 'fa-solid fa-cloud-sun', url: 'https://www.msn.cn/zh-cn/weather/forecast/in-%E5%B9%BF%E4%B8%9C%E7%9C%81,%E7%BD%97%E6%B9%96%E5%8C%BA?loc=eyJsIjoi572X5rmW5Yy6IiwiciI6IuW5v%2BS4nOecgSIsImMiOiLkuK3ljY7kurrmsJHlhbHlkozlm70iLCJpIjoiQ04iLCJnIjoiemgtY24iLCJ4IjoiMTE0LjEzMTk4NDkyIiwieSI6IjIyLjU1MDE4MTUifQ%3D%3D&weadegreetype=C&ocid=ansmsnw' },
-       { id: 2, title: '电影', icon: 'fa-solid fa-film', url: '#' },
-       { id: 3, title: '音乐', icon: 'fa-solid fa-music', url: 'https://music.imsyy.com/' },
-       { id: 4, title: '学习', icon: 'fa-solid fa-book', url: '#' },
-       { id: 6, title: '时间胶囊', icon: 'fa-solid fa-hourglass-half', url: '#' },
-       { id: 7, title: '实用工具', icon: 'fa-solid fa-wrench', url: 'https://fly63.com/tool/home.html' },
-       { id: 8, title: 'AI工具', icon: 'fa-solid fa-robot', url: '#' },
-       { id: 9, title: '传送门', icon: 'fa-solid fa-link', url: 'https://travel.moe/go' },
-       { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
-     ];
+      // 当前页码状态
+      const [currentPage, setCurrentPage] = useState(1);
+      const itemsPerPage = 6; // 每页显示6个功能按钮
+      
+       // 功能按钮数据
+      const featureLinks: LinkItem[] = [
+        { id: 1, title: '天气', icon: 'fa-solid fa-cloud-sun', url: 'https://www.msn.cn/zh-cn/weather/forecast/in-%E5%B9%BF%E4%B8%9C%E7%9C%81,%E7%BD%97%E6%B9%96%E5%8C%BA?loc=eyJsIjoi572X5rmW5Yy6IiwiciI6IuW5v%2BS4nOecgSIsImMiOiLkuK3ljY7kurrmsJHlhbHlkozlm70iLCJpIjoiQ04iLCJnIjoiemgtY24iLCJ4IjoiMTE0LjEzMTk4NDkyIiwieSI6IjIyLjU1MDE4MTUifQ%3D%3D&weadegreetype=C&ocid=ansmsnw' },
+         { id: 2, title: '影视', icon: 'fa-solid fa-film', url: '#' },
+        { id: 3, title: '音乐', icon: 'fa-solid fa-music', url: 'https://music.imsyy.com/' },
+        { id: 4, title: '学习', icon: 'fa-solid fa-book', url: '#' },
+         { id: 8, title: 'AI工具', icon: 'fa-solid fa-robot', url: '#' },
+         { id: 7, title: '实用工具', icon: 'fa-solid fa-wrench', url: 'https://fly63.com/tool/home.html' },
+         { id: 6, title: '时间胶囊', icon: 'fa-solid fa-hourglass-half', url: '#' },
+         { id: 9, title: '传送门', icon: 'fa-solid fa-link', url: 'https://travel.moe/go' },
+
+          { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
+      ];
+      
+      // 计算总页数
+      const totalPages = Math.ceil(featureLinks.length / itemsPerPage);
+      
+      // 获取当前页显示的功能按钮
+      const currentFeatureLinks = featureLinks.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      );
+      
+      // 处理鼠标滚轮事件实现翻页
+      const handleWheel = (e: React.WheelEvent) => {
+        e.preventDefault();
+        if (e.deltaY > 0 && currentPage < totalPages) {
+          // 向下滚动，下一页
+          setCurrentPage(prev => prev + 1);
+        } else if (e.deltaY < 0 && currentPage > 1) {
+          // 向上滚动，上一页
+          setCurrentPage(prev => prev - 1);
+        }
+      };
+      
+      // 处理页码点击事件
+      const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+          setCurrentPage(page);
+        }
+      };
 
   // 社交媒体数据
-  const socialItems: SocialItem[] = [
-    { id: 1, icon: 'fa-brands fa-github', url: '#', name: 'GitHub' },
-    { id: 2, icon: 'fa-brands fa-twitter', url: '#', name: 'Twitter' },
-    { id: 3, icon: 'fa-brands fa-instagram', url: '#', name: 'Instagram' },
-    { id: 4, icon: 'fa-brands fa-linkedin', url: '#', name: 'LinkedIn' },
-    { id: 5, icon: 'fa-solid fa-envelope', url: '#', name: 'Email' },
-  ];
+const socialItems: SocialItem[] = [
+  { id: 1, icon: 'fa-brands fa-github', url: 'https://github.com/lyjy6666', name: 'GitHub' },
+  { id: 2, icon: 'fa-brands fa-tiktok', url: 'https://www.douyin.com/user/MS4wLjABAAAAK2HSwJN07NwDYxX-0A3YpvAPQ00MSUw-TCqKM-xlBFT70ozZdm9FxHgSHGapYT_S', name: '抖音' },
+  { id: 3, icon: 'fa-brands fa-bilibili', url: 'https://space.bilibili.com/1983970346?spm_id_from=333.1007.0.0', name: 'bilibili' },
+];
 
   // 更新时间和日期
   useEffect(() => {
@@ -421,43 +457,78 @@ export default function Home() {
            </div>
  
            {/* 链接卡片网格 */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {links.map(link => (
-                <a 
-                  key={link.id}
-                  href={link.url}
-                   className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
-                    aria-label={link.title}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (link.id === 1 || link.id === 3) {
-                          // 天气和音乐按钮在新标签页打开
-                          window.open(link.url, '_blank');
-                        } else if (link.id === 2) {
-                          setIsMovieModalOpen(true);
-                        } else if (link.id === 4) {
-                           setIsStudyModalOpen(true);
-                         } else if (link.id === 7) {
-                            setIsUtilityModalOpen(true);
-                        } else if (link.id === 8) {
-                            setIsAIToolsModalOpen(true);
-                        } else if (link.id === 6) {
-                            // 打开时间胶囊模态框
-                            setIsTimeCapsuleModalOpen(true);
-                        } else if (link.id === 9) {
-                            // 打开传送门警告弹窗
-                            setIsPortalWarningOpen(true);
-                        } else if (link.id === 10) {
-                            // 打开"其他"功能模态框
-                            setIsOtherModalOpen(true);
-                        }
-                    }}
-                >
-                  <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
-                  <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
-                </a>
-              ))}
-            </div>
+             {/* 添加鼠标滚轮事件监听器实现翻页 */}
+             <div 
+               className="grid grid-cols-2 md:grid-cols-3 gap-4"
+               onWheel={handleWheel}
+               style={{ touchAction: 'none' }} // 防止触摸设备上的默认滚动行为
+             >
+               {/* 当前页的功能按钮 */}
+               {currentFeatureLinks.map(link => (
+                 <a 
+                   key={link.id}
+                   href={link.url}
+                    className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
+                     aria-label={link.title}
+                       onClick={(e) => {
+                         e.preventDefault();
+                         if (link.id === 1 || link.id === 3) {
+                           // 天气和音乐按钮在新标签页打开
+                           window.open(link.url, '_blank');
+                          } else if (link.id === 2) {
+                            // 影视按钮打开模态框
+                            setIsMovieModalOpen(true);
+                          } else if (link.id === 11) {
+                            // 极直播按钮在新标签页打开
+                            window.open(link.url, '_blank');
+                          } else if (link.id === 4) {
+                            setIsStudyModalOpen(true);
+                          } else if (link.id === 7) {
+                             setIsUtilityModalOpen(true);
+                         } else if (link.id === 8) {
+                             setIsAIToolsModalOpen(true);
+                         } else if (link.id === 6) {
+                             // 打开时间胶囊模态框
+                             setIsTimeCapsuleModalOpen(true);
+                         } else if (link.id === 9) {
+                             // 打开传送门警告弹窗
+                             setIsPortalWarningOpen(true);
+                         } else if (link.id === 10) {
+                             // 打开"其他"功能模态框
+                             setIsOtherModalOpen(true);
+
+                         } else if (link.id === 12) {
+                             toast('笔记功能即将上线', {
+                               position: 'bottom-right',
+                               className: 'bg-black/80 text-white border-none'
+                             });
+                          }
+                     }}
+                 >
+                   <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
+                   <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
+                 </a>
+               ))}
+               
+               {/* 分页按钮 - 最后三个位置 */}
+                   <div className="relative w-full bg-white/20 h-1 rounded-full cursor-pointer">
+                     <button
+                       onClick={() => handlePageChange(1)}
+                       className={`absolute left-0 top-0 h-full w-1/2 transition-all duration-300 ${
+                         currentPage === 1 ? 'bg-white/40 rounded-l-full' : 'hover:bg-white/30 rounded-l-full'
+                       }`}
+                       aria-label="第一页"
+                     ></button>
+                     <div className="absolute left-1/2 top-0 bottom-0 w-px bg-black/30"></div>
+                     <button
+                       onClick={() => handlePageChange(2)}
+                       className={`absolute right-0 top-0 h-full w-1/2 transition-all duration-300 ${
+                         currentPage === 2 ? 'bg-white/40 rounded-r-full' : 'hover:bg-white/30 rounded-r-full'
+                       }`}
+                       aria-label="第二页"
+                     ></button>
+                   </div>
+             </div>
             
             {/* 电影网站选择模态框 */}
             {isMovieModalOpen && (
@@ -471,7 +542,7 @@ export default function Home() {
                 {/* 模态框内容 */}
                 <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl">
                   <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-white text-xl font-semibold">选择电影网站</h3>
+                     <h3 className="text-white text-xl font-semibold">选择影视网站</h3>
                     <button 
                       onClick={() => setIsMovieModalOpen(false)}
                       className="text-white/60 hover:text-white transition-colors"
@@ -498,9 +569,19 @@ export default function Home() {
                          className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
                          onClick={() => setIsMovieModalOpen(false)}
                        >
-                         <i className="fa-solid fa-video mr-2"></i>星空影院（不卡，但视频中有广）
-                       </a>
-                     </div>
+                          <i className="fa-solid fa-video mr-2"></i>星空影院（不卡，但视频中有广）
+                        </a>
+                        
+                        <a 
+                          href="https://jzb123.czzxcp.com/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                          onClick={() => setIsMovieModalOpen(false)}
+                        >
+                          <i className="fa-solid fa-tv mr-2"></i>极直播（体育比赛直播）
+                        </a>
+                      </div>
                   
                   <p className="text-white/40 text-xs text-center mt-6">
                     点击外部区域或关闭按钮也可关闭
@@ -535,26 +616,42 @@ export default function Home() {
                     {/* 内容区域 */}
                     <div className="p-6 max-h-[60vh] overflow-y-auto">
                       {/* 最新更新 */}
-                      <div className="mb-8">  
-                        <div className="flex items-center mb-3">
-                          <div className="w-3 h-10 bg-blue-500 rounded-l mr-4"></div>
-                          <h4 className="text-lg font-semibold text-gray-800">2025.8.11 更新 v2.1</h4>
+                       <div className="mb-8">  
+                          <div className="flex items-center mb-3">
+                            <div className="w-3 h-10 bg-blue-500 rounded-l mr-4"></div>
+                            <h4 className="text-lg font-semibold text-gray-800">2025.8.27 更新 v2.2</h4>
+                          </div>
+                          <ul className="ml-7 space-y-2 text-gray-600">
+                            <li className="flex items-start">
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <span>新增了一些内容</span>
+                            </li>
+                            <li className="flex items-start">
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <span>修复了一些已知问题</span>
+                            </li>
+                          </ul>
                         </div>
-                        <ul className="ml-7 space-y-2 text-gray-600">
-                          <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
-                            <span>ai功能ui界面大调整</span>
-                          </li>
-                          <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
-                            <span>页面更加美观</span>
-                          </li>
-                          <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
-                            <span>修复了一些已知问题，提升体验感</span>
-                          </li>
-                        </ul>
-                      </div>
+                        <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-gray-800">2025.8.11 更新 v2.1</h4>
+                          </div>
+                          <ul className="ml-7 space-y-2 text-gray-600">
+                            <li className="flex items-start">
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <span>ai功能ui界面大调整</span>
+                            </li>
+                            <li className="flex items-start">
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <span>页面更加美观</span>
+                            </li>
+                            <li className="flex items-start">
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <span>修复了一些已知问题，提升体验感</span>
+                            </li>
+                          </ul>
+                        </div>
                       
                       {/* 历史更新 */}
                       <div className="mb-8">  
@@ -953,9 +1050,20 @@ export default function Home() {
                          title="haisnap"
                        >
                           <i className="fa-solid fa-code mr-3"></i>haisnap（基本主要与编程有关，测试阶段，进阶版进群获得，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                       </a>
+                        </a>
 
-                        <div className="text-white text-lg font-medium mb-2">不太推荐</div>
+                        <a 
+                          href="https://autoglm.zhipuai.cn/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
+                          onClick={() => setIsAIToolsModalOpen(false)}
+                          title="autoglm"
+                        >
+                           <i className="fa-solid fa-robot mr-3"></i>autoglm（可以自己操控电脑/手机，自己上各大平台搜索，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
+                        </a>
+
+                         <div className="text-white text-lg font-medium mb-2">不太推荐</div>
 
                        <a 
                          href="https://www.deepseek.com" 
@@ -985,7 +1093,7 @@ export default function Home() {
               </main>
 
               {/* 左下角版本号 */}
-  <div className="fixed bottom-6 left-6 text-orange-300 text-4xl font-bold transform -rotate-12 z-20">v2.1</div>
+  <div className="fixed bottom-6 left-6 text-orange-300 text-4xl font-bold transform -rotate-12 z-20">v2.2</div>
 
             {/* 意见反馈弹窗 */}
             {isFeedbackModalOpen && (
@@ -1081,34 +1189,38 @@ export default function Home() {
                </div>
              )}
    
-         {/* 底部社交链接 */}
+
+
+          {/* 底部社交链接 */}
           {/* 更新日志按钮 - 右下角固定位置 */}
-          <button 
-            onClick={() => setIsUpdateLogOpen(true)}
-            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110"
-            aria-label="查看更新日志"
-          >
-            <i className="fa-solid fa-history"></i>
-          </button>
+           <button 
+  onClick={() => window.open('https://lyjy.netlify.app', '_blank')}
+  className="fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110"
+  aria-label="访问lyjy.netlify.app"
+>
+  <i className="fa-solid fa-paper-plane"></i>
+</button>
+           <button 
+  onClick={() => setIsUpdateLogOpen(true)}
+  className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110"
+  aria-label="查看更新日志"
+>
+  <i className="fa-solid fa-history"></i>
+</button>
 
           <footer className="relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm">
           <div className="container mx-auto flex justify-center space-x-6">
              {socialItems.map(item => (
-               <a 
-                 key={item.id}
-                 href={item.url}
-                 className="text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
-                 aria-label={item.name}
-                 onClick={(e) => {
-                   e.preventDefault();
- toast('此功能即将上线，感谢您的使用', {
-         position: 'bottom-right',
-         className: 'bg-black/80 text-white border-none'
-                   });
-                 }}
-               >
-                 <i className={item.icon}></i>
-               </a>
+                 <a 
+                   key={item.id}
+                   href={item.url}
+                   className="text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
+                   aria-label={item.name}
+                   target={item.name === '抖音' || item.name === 'GitHub' ? '_blank' : undefined}
+                   rel={(item.name === '抖音' || item.name === 'GitHub') ? 'noopener noreferrer' : undefined}
+                 >
+                   <i className={item.icon}></i>
+                 </a>
              ))}
        </div>
        

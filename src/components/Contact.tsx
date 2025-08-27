@@ -158,8 +158,10 @@ const Contact = () => {
             <div className="mt-12">
               <h4 className="text-lg font-semibold mb-4">关注我</h4>
               <div className="flex space-x-4">
-                <a 
-                  href="#" 
+               <a 
+                  href="https://github.com/lyjy6666" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   aria-label="GitHub"
                 >
@@ -168,23 +170,16 @@ const Contact = () => {
                 <a 
                   href="#" 
                   className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  aria-label="LinkedIn"
+                  aria-label="抖音"
                 >
-                  <i className="fa-brands fa-linkedin"></i>
+                  <i className="fa-brands fa-tiktok"></i>
                 </a>
-                <a 
+                   <a href="https://space.bilibili.com/1983970346?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer"
                   href="#" 
                   className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  aria-label="Twitter"
+                  aria-label="bilibili"
                 >
-                  <i className="fa-brands fa-twitter"></i>
-                </a>
-                <a 
-                  href="#" 
-                  className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  aria-label="Dribbble"
-                >
-                  <i className="fa-brands fa-dribbble"></i>
+                  <i className="fa-brands fa-bilibili"></i>
                 </a>
               </div>
             </div>
