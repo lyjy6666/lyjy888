@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import HolidayCalendar from '@/components/HolidayCalendar';
 
 // 定义链接数据类型
 interface LinkItem {
@@ -67,6 +68,8 @@ export default function Home() {
   const [isUpdateLogOpen, setIsUpdateLogOpen] = useState(false);
   // 传送门倒计时
   const [portalCountdown, setPortalCountdown] = useState(10);
+  // 假期日历模态框状态
+  const [isHolidayCalendarOpen, setIsHolidayCalendarOpen] = useState(false);
   
 
   
@@ -101,65 +104,17 @@ export default function Home() {
     { text: "人的价值，在遭受诱惑的一瞬间被决定。", author: "柏拉图" }
   ];
 
-   // 获取名言数据
-   const fetchQuote = async () => {
+   // 获取名言数据 - 直接使用本地备份数据以避免API错误
+   const fetchQuote = () => {
      setQuoteLoading(true);
-     try {
-       // 尝试获取名言API
-       const response = await fetch('https://v.api.aa1.cn/api/yiyan/index.php');
-       
-       // 检查HTTP响应状态
-       if (!response.ok) {
-         throw new Error(`HTTP错误! 状态码: ${response.status}`);
-       }
-       
-       // 先获取响应文本，检查是否为HTML
-       const responseText = await response.text();
-       
-       // 检查是否包含HTML标签
-       if (responseText.includes('<') && responseText.includes('>')) {
-         // 如果是HTML，尝试提取文本内容
-         const tempDiv = document.createElement('div');
-         tempDiv.innerHTML = responseText;
-         const text = tempDiv.textContent?.trim() || '获取名言失败';
-         
-         // 使用提取的文本和备份作者
-         const randomIndex = Math.floor(Math.random() * backupQuotes.length);
-         setCurrentQuote({
-           text: text,
-           author: backupQuotes[randomIndex].author
-         });
-       } else {
-         // 如果不是HTML，尝试解析为JSON
-         try {
-           const data = JSON.parse(responseText);
-           
-           // 验证API响应格式
-           if (!data.hitokoto) {
-             throw new Error("API响应格式不正确");
-           }
-           
-           setCurrentQuote({
-             text: data.hitokoto,
-             author: data.from || '未知作者'
-           });
-         } catch (jsonError) {
-           // JSON解析失败，使用备份名言
-           const randomIndex = Math.floor(Math.random() * backupQuotes.length);
-           setCurrentQuote(backupQuotes[randomIndex]);
-         }
-       }
-     } catch (error) {
-       // 详细错误日志
-       console.error('获取名言失败:', error);
-       
+     
+     // 短暂延迟模拟加载过程
+     setTimeout(() => {
        // 使用随机本地备份名言
        const randomIndex = Math.floor(Math.random() * backupQuotes.length);
        setCurrentQuote(backupQuotes[randomIndex]);
-       
-     } finally {
        setQuoteLoading(false);
-     }
+     }, 500);
    };
   
    // 初始获取名言并设置自动刷新
@@ -270,10 +225,11 @@ export default function Home() {
          { id: 8, title: 'AI工具', icon: 'fa-solid fa-robot', url: '#' },
          { id: 7, title: '实用工具', icon: 'fa-solid fa-wrench', url: 'https://fly63.com/tool/home.html' },
          { id: 6, title: '时间胶囊', icon: 'fa-solid fa-hourglass-half', url: '#' },
-         { id: 9, title: '传送门', icon: 'fa-solid fa-link', url: 'https://travel.moe/go' },
+            { id: 9, title: '传送门', icon: 'fa-solid fa-link', url: 'https://travel.moe/go' },
 
-          { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
-      ];
+             { id: 11, title: '假期日历', icon: 'fa-solid fa-calendar-days', url: '#' },
+             { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
+       ];
       
       // 计算总页数
       const totalPages = Math.ceil(featureLinks.length / itemsPerPage);
@@ -456,62 +412,59 @@ const socialItems: SocialItem[] = [
               </div>
            </div>
  
-           {/* 链接卡片网格 */}
-             {/* 添加鼠标滚轮事件监听器实现翻页 */}
-             <div 
-               className="grid grid-cols-2 md:grid-cols-3 gap-4"
-               onWheel={handleWheel}
-               style={{ touchAction: 'none' }} // 防止触摸设备上的默认滚动行为
-             >
-               {/* 当前页的功能按钮 */}
-               {currentFeatureLinks.map(link => (
-                 <a 
-                   key={link.id}
-                   href={link.url}
-                    className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
-                     aria-label={link.title}
-                       onClick={(e) => {
-                         e.preventDefault();
-                         if (link.id === 1 || link.id === 3) {
-                           // 天气和音乐按钮在新标签页打开
-                           window.open(link.url, '_blank');
-                          } else if (link.id === 2) {
-                            // 影视按钮打开模态框
-                            setIsMovieModalOpen(true);
-                          } else if (link.id === 11) {
-                            // 极直播按钮在新标签页打开
+            {/* 链接卡片网格 */}
+              {/* 添加鼠标滚轮事件监听器实现翻页 */}
+              <div 
+                className="grid grid-cols-2 md:grid-cols-3 gap-4"
+                onWheel={handleWheel}
+                style={{ touchAction: 'none' }} // 防止触摸设备上的默认滚动行为
+              >
+                {/* 当前页的功能按钮 */}
+                {currentFeatureLinks.map(link => (
+                  <a 
+                    key={link.id}
+                    href={link.url}
+                     className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
+                      aria-label={link.title}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (link.id === 1 || link.id === 3) {
+                            // 天气和音乐按钮在新标签页打开
                             window.open(link.url, '_blank');
-                          } else if (link.id === 4) {
-                            setIsStudyModalOpen(true);
-                          } else if (link.id === 7) {
-                             setIsUtilityModalOpen(true);
-                         } else if (link.id === 8) {
-                             setIsAIToolsModalOpen(true);
-                         } else if (link.id === 6) {
-                             // 打开时间胶囊模态框
-                             setIsTimeCapsuleModalOpen(true);
-                         } else if (link.id === 9) {
-                             // 打开传送门警告弹窗
-                             setIsPortalWarningOpen(true);
-                         } else if (link.id === 10) {
-                             // 打开"其他"功能模态框
-                             setIsOtherModalOpen(true);
-
-                         } else if (link.id === 12) {
-                             toast('笔记功能即将上线', {
-                               position: 'bottom-right',
-                               className: 'bg-black/80 text-white border-none'
-                             });
-                          }
-                     }}
-                 >
-                   <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
-                   <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
-                 </a>
-               ))}
-               
-               {/* 分页按钮 - 最后三个位置 */}
-                   <div className="relative w-full bg-white/20 h-1 rounded-full cursor-pointer">
+                           } else if (link.id === 2) {
+                             // 影视按钮打开模态框
+                             setIsMovieModalOpen(true);
+                            } else if (link.id === 11) {
+                              // 打开假期日历模态框
+                              setIsHolidayCalendarOpen(true);
+                            } else if (link.id === 4) {
+                             setIsStudyModalOpen(true);
+                           } else if (link.id === 7) {
+                              setIsUtilityModalOpen(true);
+                          } else if (link.id === 8) {
+                              setIsAIToolsModalOpen(true);
+                          } else if (link.id === 6) {
+                              // 打开时间胶囊模态框
+                              setIsTimeCapsuleModalOpen(true);
+                          } else if (link.id === 9) {
+                              // 打开传送门警告弹窗
+                              setIsPortalWarningOpen(true);
+                           } else if (link.id === 10) {
+                               // 打开"其他"功能模态框
+                            setIsOtherModalOpen(true);
+                       }
+                      }}
+                  >
+                    <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
+                    <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
+                  </a>
+                ))}
+              </div>
+              
+               {/* 分页按钮 - 移到假期日历下 */}
+               {totalPages > 1 && (
+                 <div className="mt-8 flex justify-center">
+                   <div className="relative w-1/2 bg-white/20 h-1 rounded-full cursor-pointer">
                      <button
                        onClick={() => handlePageChange(1)}
                        className={`absolute left-0 top-0 h-full w-1/2 transition-all duration-300 ${
@@ -528,7 +481,8 @@ const socialItems: SocialItem[] = [
                        aria-label="第二页"
                      ></button>
                    </div>
-             </div>
+                 </div>
+               )}
             
             {/* 电影网站选择模态框 */}
             {isMovieModalOpen && (
@@ -572,15 +526,15 @@ const socialItems: SocialItem[] = [
                           <i className="fa-solid fa-video mr-2"></i>星空影院（不卡，但视频中有广）
                         </a>
                         
-                        <a 
-                          href="https://jzb123.czzxcp.com/" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
-                          onClick={() => setIsMovieModalOpen(false)}
-                        >
-                          <i className="fa-solid fa-tv mr-2"></i>极直播（体育比赛直播）
-                        </a>
+                         <a 
+                           href="https://jzb762.com/" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                           onClick={() => setIsMovieModalOpen(false)}
+                         >
+                           <i className="fa-solid fa-tv mr-2"></i>极直播（体育比赛直播）
+                         </a>
                       </div>
                   
                   <p className="text-white/40 text-xs text-center mt-6">
@@ -616,22 +570,38 @@ const socialItems: SocialItem[] = [
                     {/* 内容区域 */}
                     <div className="p-6 max-h-[60vh] overflow-y-auto">
                       {/* 最新更新 */}
-                       <div className="mb-8">  
-                          <div className="flex items-center mb-3">
-                            <div className="w-3 h-10 bg-blue-500 rounded-l mr-4"></div>
-                            <h4 className="text-lg font-semibold text-gray-800">2025.8.27 更新 v2.2</h4>
-                          </div>
-                          <ul className="ml-7 space-y-2 text-gray-600">
-                            <li className="flex items-start">
-                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
-                              <span>新增了一些内容</span>
-                            </li>
-                            <li className="flex items-start">
-                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
-                              <span>修复了一些已知问题</span>
-                            </li>
-                          </ul>
-                        </div>
+                        <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-blue-500 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-gray-800">2026.1.29 更新 v2.4</h4>
+                           </div>
+                           <ul className="ml-7 space-y-2 text-gray-600">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <span>增加了假期日历</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <span>修复了一些已知问题</span>
+                             </li>
+                           </ul>
+                         </div>
+                         <div className="mb-8">  
+                            <div className="flex items-center mb-3">
+                              <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
+                              <h4 className="text-lg font-semibold text-gray-800">2025.8.27 更新 v2.2</h4>
+                            </div>
+                           <ul className="ml-7 space-y-2 text-gray-600">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <span>新增了一些内容</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <span>修复了一些已知问题</span>
+                             </li>
+                           </ul>
+                         </div>
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
                              <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
@@ -1038,8 +1008,8 @@ const socialItems: SocialItem[] = [
                          onClick={() => setIsAIToolsModalOpen(false)}
                          title="TRAE"
                        >
-                          <i className="fa-solid fa-cogs mr-3"></i>trae（编程专用，但效果好，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
-                       </a>
+                           <i className="fa-solid fa-cogs mr-3"></i>trae（编程专用，效果好，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
+                        </a>
 
                        <a 
                          href="https://www.haisnap.com" 
@@ -1049,8 +1019,8 @@ const socialItems: SocialItem[] = [
                          onClick={() => setIsAIToolsModalOpen(false)}
                          title="haisnap"
                        >
-                          <i className="fa-solid fa-code mr-3"></i>haisnap（基本主要与编程有关，测试阶段，进阶版进群获得，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                        </a>
+                           <i className="fa-solid fa-code mr-3"></i>haisnap（基本主要与编程有关，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
+                         </a>
 
                         <a 
                           href="https://autoglm.zhipuai.cn/" 
@@ -1069,7 +1039,7 @@ const socialItems: SocialItem[] = [
                          href="https://www.deepseek.com" 
                          target="_blank" 
                          rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50 cursor-not-allowed"
+                         className="block w-full bg-gray-700 hover:bg-gray-600 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50 cursor-not-allowed"
                          title="DeepSeek"
                        >
                           <i className="fa-solid fa-microchip mr-3"></i>DeepSeek（错误多，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
@@ -1079,7 +1049,7 @@ const socialItems: SocialItem[] = [
                          href="https://chatgpt.com" 
                          target="_blank" 
                          rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50"
+                         className="block w-full bg-gray-700 hover:bg-gray-600 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50"
                          title="ChatGPT"
                        >
                           <i className="fa-solid fa-brain mr-3"></i>ChatGPT（需要魔法嘿嘿，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
@@ -1090,10 +1060,16 @@ const socialItems: SocialItem[] = [
               </div>
             )}
             
-              </main>
+               </main>
 
-              {/* 左下角版本号 */}
-  <div className="fixed bottom-6 left-6 text-orange-300 text-4xl font-bold transform -rotate-12 z-20">v2.2</div>
+              {/* 假期日历模态框 */}
+              <HolidayCalendar 
+                isOpen={isHolidayCalendarOpen} 
+                onClose={() => setIsHolidayCalendarOpen(false)} 
+              />
+
+               {/* 左下角版本号 */}
+   <div className="fixed bottom-6 left-6 text-orange-300 text-4xl font-bold transform -rotate-12 z-20">v2.4</div>
 
             {/* 意见反馈弹窗 */}
             {isFeedbackModalOpen && (
