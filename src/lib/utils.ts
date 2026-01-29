@@ -5,9 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-  
+   
 // 获取关系路径的显示名称函数
 export function getRelationshipPathName(path: string[]): string {
   if (path.length === 0) return "";
   
+  return path.join("/");
 }

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-  import { cn } from '@/lib/utils';
   import { motion } from 'framer-motion';
 
   // 定义假期类型
@@ -64,7 +63,7 @@ import { useState, useEffect } from 'react';
     const [upcomingHolidays, setUpcomingHolidays] = useState<Holiday[]>([]);
     const [remainingYearHolidays, setRemainingYearHolidays] = useState(0);
     const [remainingMonthHolidays, setRemainingMonthHolidays] = useState(0);
-    const [currentMonth, setCurrentMonth] = useState(new Date().toLocaleDateString('zh-CN', { month: 'long' }));
+  const [currentMonth] = useState(new Date().toLocaleDateString('zh-CN', { month: 'long' }));
     const [currentYear] = useState(new Date().getFullYear());
 
     // 初始化和更新数据

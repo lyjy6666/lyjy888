@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -174,8 +173,7 @@ const Contact = () => {
                 >
                   <i className="fa-brands fa-tiktok"></i>
                 </a>
-                   <a href="https://space.bilibili.com/1983970346?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer"
-                  href="#" 
+                    <a href="https://space.bilibili.com/1983970346?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer"
                   className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   aria-label="bilibili"
                 >

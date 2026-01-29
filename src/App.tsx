@@ -6,7 +6,7 @@ import Loading from '@/components/Loading';
 import { motion } from 'framer-motion';
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const logout = () => {

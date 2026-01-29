@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
-import { cn } from '@/lib/utils';
 
 // 技能数据
 const skillsData = [

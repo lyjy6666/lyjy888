@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import HolidayCalendar from '@/components/HolidayCalendar';
 
 // 定义链接数据类型
@@ -29,10 +28,9 @@ export default function Home() {
   // 状态管理
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentDate, setCurrentDate] = useState('');
-  // 特别鸣谢模态框状态
-  const [isThanksModalOpen, setIsThanksModalOpen] = useState(false);
   // 学习模态框状态
-   const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
+  const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
+
 
 
 

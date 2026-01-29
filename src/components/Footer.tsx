@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+// Footer component
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
