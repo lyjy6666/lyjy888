@@ -1,13 +1,4 @@
 {
-  "name": "project_template_react",
-  "private": true,
-  "version": "0.0.1",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
   "dependencies": {
     "clsx": "^2.1.1",
     "framer-motion": "^12.0.0",
@@ -20,6 +11,7 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
+    "@coze-arch/vite-plugin-react-refresh-cloudide": "0.0.1-alpha.f2c4f1",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
@@ -28,7 +20,19 @@
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.2.0",
-    "vite": "^5.0.0",
+    "vite": "^7.2.4",
     "vite-tsconfig-paths": "^4.2.0"
-  }
+  },
+  "name": "project_template_react",
+  "private": true,
+  "scripts": {
+    "build": "bash ./scripts/build.sh",
+    "dev": "bash ./scripts/dev.sh",
+    "lint": "eslint",
+    "preinstall": "npx only-allow pnpm",
+    "start": "bash ./scripts/start.sh",
+    "ts-check": "tsc -p tsconfig.json"
+  },
+  "type": "module",
+  "version": "0.0.1"
 }

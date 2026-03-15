@@ -1,6 +1,9 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import HolidayCalendar from '@/components/HolidayCalendar';
+import MusicPlayer from '@/components/MusicPlayer';
+import AITools from '@/components/AITools';
 
 // 定义链接数据类型
 interface LinkItem {
@@ -42,10 +45,11 @@ export default function Home() {
 
   // 名言状态
   const [currentQuote, setCurrentQuote] = useState<Quote>({
-    text: "加载中...",
-    author: "获取名言中"
+    text: "生活就像海洋，只有意志坚强的人才能到达彼岸。",
+    author: "马克思"
   });
-  const [quoteLoading, setQuoteLoading] = useState(true);
+  // 名言淡入淡出状态
+  const [quoteVisible, setQuoteVisible] = useState(true);
   
   // 电影模态框状态
   const [isMovieModalOpen, setIsMovieModalOpen] = useState(false);
@@ -68,6 +72,11 @@ export default function Home() {
   const [portalCountdown, setPortalCountdown] = useState(10);
   // 假期日历模态框状态
   const [isHolidayCalendarOpen, setIsHolidayCalendarOpen] = useState(false);
+  
+  // 检测是否有任何模态框打开（用于隐藏底部元素）
+  const isAnyModalOpen = isStudyModalOpen || isMovieModalOpen || isTimeCapsuleModalOpen || 
+    isAIToolsModalOpen || isOtherModalOpen || isUtilityModalOpen || isFeedbackModalOpen || 
+    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen;
   
 
   
@@ -93,26 +102,664 @@ export default function Home() {
 
 
 
-  // 本地备份名言，当API不可用时使用
+  // 本地备份名言库 - 500条精选名言
   const backupQuotes: Quote[] = [
+    // 中国古代名言
+    { text: "天行健，君子以自强不息。", author: "《周易》" },
+    { text: "地势坤，君子以厚德载物。", author: "《周易》" },
+    { text: "学而时习之，不亦说乎？", author: "孔子" },
+    { text: "三人行，必有我师焉。", author: "孔子" },
+    { text: "知之者不如好之者，好之者不如乐之者。", author: "孔子" },
+    { text: "己所不欲，勿施于人。", author: "孔子" },
+    { text: "温故而知新，可以为师矣。", author: "孔子" },
+    { text: "学而不思则罔，思而不学则殆。", author: "孔子" },
+    { text: "知者乐水，仁者乐山。", author: "孔子" },
+    { text: "君子坦荡荡，小人长戚戚。", author: "孔子" },
+    { text: "不患人之不己知，患不知人也。", author: "孔子" },
+    { text: "逝者如斯夫，不舍昼夜。", author: "孔子" },
+    { text: "道不同，不相为谋。", author: "孔子" },
+    { text: "知者不惑，仁者不忧，勇者不惧。", author: "孔子" },
+    { text: "工欲善其事，必先利其器。", author: "孔子" },
+    { text: "言必信，行必果。", author: "孔子" },
+    { text: "有朋自远方来，不亦乐乎？", author: "孔子" },
+    { text: "德不孤，必有邻。", author: "孔子" },
+    { text: "人无远虑，必有近忧。", author: "孔子" },
+    { text: "吾日三省吾身。", author: "曾子" },
+    { text: "修身齐家治国平天下。", author: "《大学》" },
+    { text: "博学之，审问之，慎思之，明辨之，笃行之。", author: "《中庸》" },
+    { text: "天将降大任于斯人也，必先苦其心志。", author: "孟子" },
+    { text: "生于忧患，死于安乐。", author: "孟子" },
+    { text: "得道者多助，失道者寡助。", author: "孟子" },
+    { text: "老吾老以及人之老，幼吾幼以及人之幼。", author: "孟子" },
+    { text: "鱼与熊掌不可兼得。", author: "孟子" },
+    { text: "民为贵，社稷次之，君为轻。", author: "孟子" },
+    { text: "穷则独善其身，达则兼济天下。", author: "孟子" },
+    { text: "天时不如地利，地利不如人和。", author: "孟子" },
+    { text: "道可道，非常道。名可名，非常名。", author: "老子" },
+    { text: "上善若水，水善利万物而不争。", author: "老子" },
+    { text: "千里之行，始于足下。", author: "老子" },
+    { text: "知人者智，自知者明。", author: "老子" },
+    { text: "大器晚成，大音希声。", author: "老子" },
+    { text: "祸兮福之所倚，福兮祸之所伏。", author: "老子" },
+    { text: "合抱之木，生于毫末。", author: "老子" },
+    { text: "天网恢恢，疏而不漏。", author: "老子" },
+    { text: "柔弱胜刚强。", author: "老子" },
+    { text: "治大国，若烹小鲜。", author: "老子" },
+    { text: "吾生也有涯，而知也无涯。", author: "庄子" },
+    { text: "庖丁解牛，游刃有余。", author: "庄子" },
+    { text: "子非鱼，安知鱼之乐？", author: "庄子" },
+    { text: "相濡以沫，不如相忘于江湖。", author: "庄子" },
+    { text: "独与天地精神往来。", author: "庄子" },
+    { text: "天地与我并生，万物与我为一。", author: "庄子" },
+    { text: "朝菌不知晦朔，蟪蛄不知春秋。", author: "庄子" },
+    { text: "君子之交淡如水，小人之交甘若醴。", author: "庄子" },
+    { text: "路漫漫其修远兮，吾将上下而求索。", author: "屈原" },
+    { text: "长太息以掩涕兮，哀民生之多艰。", author: "屈原" },
+    { text: "亦余心之所善兮，虽九死其犹未悔。", author: "屈原" },
+    { text: "举世皆浊我独清，众人皆醉我独醒。", author: "屈原" },
+    { text: "不积跬步，无以至千里。", author: "荀子" },
+    { text: "锲而不舍，金石可镂。", author: "荀子" },
+    { text: "青，取之于蓝而青于蓝。", author: "荀子" },
+    { text: "蓬生麻中，不扶而直。", author: "荀子" },
+    { text: "水能载舟，亦能覆舟。", author: "荀子" },
+    { text: "天行有常，不为尧存，不为桀亡。", author: "荀子" },
+    { text: "知己知彼，百战不殆。", author: "孙子" },
+    { text: "兵者，国之大事，死生之地，存亡之道。", author: "孙子" },
+    { text: "不战而屈人之兵，善之善者也。", author: "孙子" },
+    { text: "兵贵神速。", author: "孙子" },
+    { text: "攻其无备，出其不意。", author: "孙子" },
+    { text: "韩信用兵，多多益善。", author: "韩信" },
+    { text: "燕雀安知鸿鹄之志哉。", author: "陈涉" },
+    { text: "王侯将相宁有种乎？", author: "陈涉" },
+    { text: "风萧萧兮易水寒，壮士一去兮不复还。", author: "荆轲" },
+    { text: "人固有一死，或重于泰山，或轻于鸿毛。", author: "司马迁" },
+    { text: "桃李不言，下自成蹊。", author: "司马迁" },
+    { text: "智者千虑，必有一失；愚者千虑，必有一得。", author: "司马迁" },
+    { text: "运筹帷幄之中，决胜千里之外。", author: "司马迁" },
+    { text: "项庄舞剑，意在沛公。", author: "司马迁" },
+    { text: "力拔山兮气盖世。", author: "项羽" },
+    { text: "大风起兮云飞扬，威加海内兮归故乡。", author: "刘邦" },
+    { text: "匈奴未灭，何以家为？", author: "霍去病" },
+    { text: "老骥伏枥，志在千里。", author: "曹操" },
+    { text: "烈士暮年，壮心不已。", author: "曹操" },
+    { text: "对酒当歌，人生几何。", author: "曹操" },
+    { text: "何以解忧，唯有杜康。", author: "曹操" },
+    { text: "鞠躬尽瘁，死而后已。", author: "诸葛亮" },
+    { text: "非淡泊无以明志，非宁静无以致远。", author: "诸葛亮" },
+    { text: "静以修身，俭以养德。", author: "诸葛亮" },
+    { text: "勿以恶小而为之，勿以善小而不为。", author: "刘备" },
+    { text: "士别三日，当刮目相待。", author: "吕蒙" },
+    { text: "司马昭之心，路人皆知。", author: "谚语" },
+    { text: "采菊东篱下，悠然见南山。", author: "陶渊明" },
+    { text: "不为五斗米折腰。", author: "陶渊明" },
+    { text: "盛年不重来，一日难再晨。", author: "陶渊明" },
+    { text: "问君何能尔，心远地自偏。", author: "陶渊明" },
+    { text: "奇文共欣赏，疑义相与析。", author: "陶渊明" },
+    { text: "粉身碎骨浑不怕，要留清白在人间。", author: "于谦" },
+    { text: "千锤万凿出深山，烈火焚烧若等闲。", author: "于谦" },
+    { text: "春风又绿江南岸，明月何时照我还。", author: "王安石" },
+    { text: "不畏浮云遮望眼，只缘身在最高层。", author: "王安石" },
+    { text: "人生自古谁无死，留取丹心照汗青。", author: "文天祥" },
+    { text: "臣心一片磁针石，不指南方不肯休。", author: "文天祥" },
+    { text: "海纳百川，有容乃大；壁立千仞，无欲则刚。", author: "林则徐" },
+    { text: "苟利国家生死以，岂因祸福避趋之。", author: "林则徐" },
+    { text: "先天下之忧而忧，后天下之乐而乐。", author: "范仲淹" },
+    { text: "不以物喜，不以己悲。", author: "范仲淹" },
+    { text: "居庙堂之高则忧其民，处江湖之远则忧其君。", author: "范仲淹" },
+    { text: "醉翁之意不在酒，在乎山水之间也。", author: "欧阳修" },
+    { text: "忧劳可以兴国，逸豫可以亡身。", author: "欧阳修" },
+    { text: "大江东去，浪淘尽，千古风流人物。", author: "苏轼" },
+    { text: "但愿人长久，千里共婵娟。", author: "苏轼" },
+    { text: "不识庐山真面目，只缘身在此山中。", author: "苏轼" },
+    { text: "人有悲欢离合，月有阴晴圆缺。", author: "苏轼" },
+    { text: "竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。", author: "苏轼" },
+    { text: "回首向来萧瑟处，归去，也无风雨也无晴。", author: "苏轼" },
+    { text: "横看成岭侧成峰，远近高低各不同。", author: "苏轼" },
+    { text: "欲把西湖比西子，淡妆浓抹总相宜。", author: "苏轼" },
+    { text: "会挽雕弓如满月，西北望，射天狼。", author: "苏轼" },
+    { text: "古之立大事者，不惟有超世之才，亦必有坚忍不拔之志。", author: "苏轼" },
+    { text: "山重水复疑无路，柳暗花明又一村。", author: "陆游" },
+    { text: "纸上得来终觉浅，绝知此事要躬行。", author: "陆游" },
+    { text: "位卑未敢忘忧国。", author: "陆游" },
+    { text: "零落成泥碾作尘，只有香如故。", author: "陆游" },
+    { text: "王师北定中原日，家祭无忘告乃翁。", author: "陆游" },
+    { text: "小楼一夜听春雨，深巷明朝卖杏花。", author: "陆游" },
+    { text: "接天莲叶无穷碧，映日荷花别样红。", author: "杨万里" },
+    { text: "小荷才露尖尖角，早有蜻蜓立上头。", author: "杨万里" },
+    { text: "问渠那得清如许，为有源头活水来。", author: "朱熹" },
+    { text: "等闲识得东风面，万紫千红总是春。", author: "朱熹" },
+    { text: "读书破万卷，下笔如有神。", author: "杜甫" },
+    { text: "会当凌绝顶，一览众山小。", author: "杜甫" },
+    { text: "安得广厦千万间，大庇天下寒士俱欢颜。", author: "杜甫" },
+    { text: "好雨知时节，当春乃发生。", author: "杜甫" },
+    { text: "出师未捷身先死，长使英雄泪满襟。", author: "杜甫" },
+    { text: "朱门酒肉臭，路有冻死骨。", author: "杜甫" },
+    { text: "两个黄鹂鸣翠柳，一行白鹭上青天。", author: "杜甫" },
+    { text: "星垂平野阔，月涌大江流。", author: "杜甫" },
+    { text: "烽火连三月，家书抵万金。", author: "杜甫" },
+    { text: "感时花溅泪，恨别鸟惊心。", author: "杜甫" },
+    { text: "露从今夜白，月是故乡明。", author: "杜甫" },
+    { text: "笔落惊风雨，诗成泣鬼神。", author: "杜甫" },
+    { text: "为人性僻耽佳句，语不惊人死不休。", author: "杜甫" },
+    { text: "此曲只应天上有，人间能得几回闻。", author: "杜甫" },
+    { text: "黄河之水天上来，奔流到海不复回。", author: "李白" },
+    { text: "天生我材必有用，千金散尽还复来。", author: "李白" },
+    { text: "长风破浪会有时，直挂云帆济沧海。", author: "李白" },
+    { text: "举头望明月，低头思故乡。", author: "李白" },
+    { text: "飞流直下三千尺，疑是银河落九天。", author: "李白" },
+    { text: "桃花潭水深千尺，不及汪伦送我情。", author: "李白" },
+    { text: "两岸猿声啼不住，轻舟已过万重山。", author: "李白" },
+    { text: "抽刀断水水更流，举杯消愁愁更愁。", author: "李白" },
+    { text: "蜀道难，难于上青天。", author: "李白" },
+    { text: "人生得意须尽欢，莫使金樽空对月。", author: "李白" },
+    { text: "安能摧眉折腰事权贵，使我不得开心颜。", author: "李白" },
+    { text: "床前明月光，疑是地上霜。", author: "李白" },
+    { text: "白发三千丈，缘愁似个长。", author: "李白" },
+    { text: "相看两不厌，只有敬亭山。", author: "李白" },
+    { text: "众鸟高飞尽，孤云独去闲。", author: "李白" },
+    { text: "清水出芙蓉，天然去雕饰。", author: "李白" },
+    { text: "我寄愁心与明月，随风直到夜郎西。", author: "李白" },
+    { text: "孤帆远影碧空尽，唯见长江天际流。", author: "李白" },
+    { text: "朝辞白帝彩云间，千里江陵一日还。", author: "李白" },
+    { text: "大鹏一日同风起，扶摇直上九万里。", author: "李白" },
+    { text: "沉舟侧畔千帆过，病树前头万木春。", author: "刘禹锡" },
+    { text: "东边日出西边雨，道是无晴却有晴。", author: "刘禹锡" },
+    { text: "旧时王谢堂前燕，飞入寻常百姓家。", author: "刘禹锡" },
+    { text: "山不在高，有仙则名；水不在深，有龙则灵。", author: "刘禹锡" },
+    { text: "千淘万漉虽辛苦，吹尽狂沙始到金。", author: "刘禹锡" },
+    { text: "春蚕到死丝方尽，蜡炬成灰泪始干。", author: "李商隐" },
+    { text: "夕阳无限好，只是近黄昏。", author: "李商隐" },
+    { text: "身无彩凤双飞翼，心有灵犀一点通。", author: "李商隐" },
+    { text: "此情可待成追忆，只是当时已惘然。", author: "李商隐" },
+    { text: "天意怜幽草，人间重晚晴。", author: "李商隐" },
+    { text: "历览前贤国与家，成由勤俭破由奢。", author: "李商隐" },
+    { text: "春眠不觉晓，处处闻啼鸟。", author: "孟浩然" },
+    { text: "气蒸云梦泽，波撼岳阳城。", author: "孟浩然" },
+    { text: "野旷天低树，江清月近人。", author: "孟浩然" },
+    { text: "待到重阳日，还来就菊花。", author: "孟浩然" },
+    { text: "葡萄美酒夜光杯，欲饮琵琶马上催。", author: "王翰" },
+    { text: "醉卧沙场君莫笑，古来征战几人回。", author: "王翰" },
+    { text: "劝君更尽一杯酒，西出阳关无故人。", author: "王维" },
+    { text: "大漠孤烟直，长河落日圆。", author: "王维" },
+    { text: "独在异乡为异客，每逢佳节倍思亲。", author: "王维" },
+    { text: "空山新雨后，天气晚来秋。", author: "王维" },
+    { text: "明月松间照，清泉石上流。", author: "王维" },
+    { text: "行到水穷处，坐看云起时。", author: "王维" },
+    { text: "红豆生南国，春来发几枝。", author: "王维" },
+    { text: "江流天地外，山色有无中。", author: "王维" },
+    { text: "草枯鹰眼疾，雪尽马蹄轻。", author: "王维" },
+    { text: "海上生明月，天涯共此时。", author: "张九龄" },
+    { text: "海内存知己，天涯若比邻。", author: "王勃" },
+    { text: "落霞与孤鹜齐飞，秋水共长天一色。", author: "王勃" },
+    { text: "人面不知何处去，桃花依旧笑春风。", author: "崔护" },
+    { text: "去年今日此门中，人面桃花相映红。", author: "崔护" },
+    { text: "莫愁前路无知己，天下谁人不识君。", author: "高适" },
+    { text: "忽如一夜春风来，千树万树梨花开。", author: "岑参" },
+    { text: "黄沙百战穿金甲，不破楼兰终不还。", author: "王昌龄" },
+    { text: "秦时明月汉时关，万里长征人未还。", author: "王昌龄" },
+    { text: "洛阳亲友如相问，一片冰心在玉壶。", author: "王昌龄" },
+    { text: "前不见古人，后不见来者。", author: "陈子昂" },
+    { text: "念天地之悠悠，独怆然而涕下。", author: "陈子昂" },
+    { text: "离离原上草，一岁一枯荣。", author: "白居易" },
+    { text: "野火烧不尽，春风吹又生。", author: "白居易" },
+    { text: "同是天涯沦落人，相逢何必曾相识。", author: "白居易" },
+    { text: "日出江花红胜火，春来江水绿如蓝。", author: "白居易" },
+    { text: "在天愿作比翼鸟，在地愿为连理枝。", author: "白居易" },
+    { text: "天长地久有时尽，此恨绵绵无绝期。", author: "白居易" },
+    { text: "乱花渐欲迷人眼，浅草才能没马蹄。", author: "白居易" },
+    { text: "最爱湖东行不足，绿杨阴里白沙堤。", author: "白居易" },
+    { text: "千呼万唤始出来，犹抱琵琶半遮面。", author: "白居易" },
+    { text: "文章合为时而著，歌诗合为事而作。", author: "白居易" },
+    { text: "回眸一笑百媚生，六宫粉黛无颜色。", author: "白居易" },
+    { text: "黑云压城城欲摧，甲光向日金鳞开。", author: "李贺" },
+    { text: "雄鸡一声天下白。", author: "李贺" },
+    { text: "少年心事当拿云。", author: "李贺" },
+    { text: "男儿何不带吴钩，收取关山五十州。", author: "李贺" },
+    { text: "天若有情天亦老。", author: "李贺" },
+    { text: "大漠沙如雪，燕山月似钩。", author: "李贺" },
+    { text: "山高月小，水落石出。", author: "苏轼" },
+    { text: "清风徐来，水波不兴。", author: "苏轼" },
+    { text: "明月几时有，把酒问青天。", author: "苏轼" },
+    { text: "人间如梦，一尊还酹江月。", author: "苏轼" },
+    { text: "莫听穿林打叶声，何妨吟啸且徐行。", author: "苏轼" },
+    { text: "细看来，不是杨花，点点是离人泪。", author: "苏轼" },
+    { text: "枝上柳绵吹又少，天涯何处无芳草。", author: "苏轼" },
+    { text: "十年生死两茫茫，不思量，自难忘。", author: "苏轼" },
+    { text: "老夫聊发少年狂，左牵黄，右擎苍。", author: "苏轼" },
+    { text: "乱石穿空，惊涛拍岸，卷起千堆雪。", author: "苏轼" },
+    { text: "莫道不销魂，帘卷西风，人比黄花瘦。", author: "李清照" },
+    { text: "寻寻觅觅，冷冷清清，凄凄惨惨戚戚。", author: "李清照" },
+    { text: "此情无计可消除，才下眉头，却上心头。", author: "李清照" },
+    { text: "知否，知否？应是绿肥红瘦。", author: "李清照" },
+    { text: "花自飘零水自流，一种相思，两处闲愁。", author: "李清照" },
+    { text: "生当作人杰，死亦为鬼雄。", author: "李清照" },
+    { text: "物是人非事事休，欲语泪先流。", author: "李清照" },
+    { text: "众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。", author: "辛弃疾" },
+    { text: "醉里挑灯看剑，梦回吹角连营。", author: "辛弃疾" },
+    { text: "想当年，金戈铁马，气吞万里如虎。", author: "辛弃疾" },
+    { text: "少年不识愁滋味，爱上层楼。", author: "辛弃疾" },
+    { text: "青山遮不住，毕竟东流去。", author: "辛弃疾" },
+    { text: "廉颇老矣，尚能饭否？", author: "辛弃疾" },
+    { text: "千古兴亡多少事？悠悠。不尽长江滚滚流。", author: "辛弃疾" },
+    { text: "稻花香里说丰年，听取蛙声一片。", author: "辛弃疾" },
+    { text: "我见青山多妩媚，料青山见我应如是。", author: "辛弃疾" },
+    { text: "把吴钩看了，栏杆拍遍，无人会，登临意。", author: "辛弃疾" },
+    { text: "天下英雄谁敌手？曹刘。生子当如孙仲谋。", author: "辛弃疾" },
+    { text: "落花人独立，微雨燕双飞。", author: "晏几道" },
+    { text: "当时明月在，曾照彩云归。", author: "晏几道" },
+    { text: "昨夜西风凋碧树，独上高楼，望尽天涯路。", author: "晏殊" },
+    { text: "无可奈何花落去，似曾相识燕归来。", author: "晏殊" },
+    { text: "多情自古伤离别，更那堪，冷落清秋节。", author: "柳永" },
+    { text: "衣带渐宽终不悔，为伊消得人憔悴。", author: "柳永" },
+    { text: "今宵酒醒何处？杨柳岸，晓风残月。", author: "柳永" },
+    { text: "忍把浮名，换了浅斟低唱。", author: "柳永" },
+    { text: "有三秋桂子，十里荷花。", author: "柳永" },
+    { text: "人有悲欢离合，月有阴晴圆缺，此事古难全。", author: "苏轼" },
+    { text: "何须浅碧深红色，自是花中第一流。", author: "李清照" },
+    { text: "世事一场大梦，人生几度秋凉。", author: "苏轼" },
+    { text: "人间有味是清欢。", author: "苏轼" },
+    { text: "小舟从此逝，江海寄余生。", author: "苏轼" },
+    { text: "竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。", author: "苏轼" },
+    { text: "此心安处是吾乡。", author: "苏轼" },
+    { text: "人生如逆旅，我亦是行人。", author: "苏轼" },
+    { text: "粗缯大布裹生涯，腹有诗书气自华。", author: "苏轼" },
+    { text: "腹有诗书气自华。", author: "苏轼" },
+    { text: "山高月小，水落石出。", author: "苏轼" },
+    { text: "春风得意马蹄疾，一日看尽长安花。", author: "孟郊" },
+    { text: "谁言寸草心，报得三春晖。", author: "孟郊" },
+    { text: "慈母手中线，游子身上衣。", author: "孟郊" },
+    { text: "夕阳西下，断肠人在天涯。", author: "马致远" },
+    { text: "枯藤老树昏鸦，小桥流水人家。", author: "马致远" },
+    { text: "古道西风瘦马，夕阳西下，断肠人在天涯。", author: "马致远" },
+    { text: "问世间，情是何物，直教生死相许。", author: "元好问" },
+    { text: "天南地北双飞客，老翅几回寒暑。", author: "元好问" },
+    { text: "我是个普天下郎君领袖，盖世界浪子班头。", author: "关汉卿" },
+    { text: "花落水流红，闲愁万种，无语怨东风。", author: "王实甫" },
+    { text: "碧云天，黄花地，西风紧，北雁南飞。", author: "王实甫" },
+    { text: "晓来谁染霜林醉？总是离人泪。", author: "王实甫" },
+    // 外国名言
     { text: "生活就像海洋，只有意志坚强的人才能到达彼岸。", author: "马克思" },
     { text: "如果冬天来了，春天还会远吗？", author: "雪莱" },
     { text: "世界上只有一种真正的英雄主义，那就是在认清生活的真相后依然热爱生活。", author: "罗曼·罗兰" },
     { text: "我们唯一需要恐惧的是恐惧本身。", author: "富兰克林·罗斯福" },
-    { text: "人的价值，在遭受诱惑的一瞬间被决定。", author: "柏拉图" }
+    { text: "人的价值，在遭受诱惑的一瞬间被决定。", author: "柏拉图" },
+    { text: "我思故我在。", author: "笛卡尔" },
+    { text: "知识就是力量。", author: "培根" },
+    { text: "人生而自由，却无往不在枷锁之中。", author: "卢梭" },
+    { text: "存在即合理。", author: "黑格尔" },
+    { text: "人是生而自由的，但却无往不在枷锁之中。", author: "卢梭" },
+    { text: "我不同意你的观点，但我誓死捍卫你说话的权利。", author: "伏尔泰" },
+    { text: "人不能两次踏进同一条河流。", author: "赫拉克利特" },
+    { text: "给我一个支点，我就能撬起整个地球。", author: "阿基米德" },
+    { text: "我爱我师，我更爱真理。", author: "亚里士多德" },
+    { text: "人是万物的尺度。", author: "普罗泰戈拉" },
+    { text: "认识你自己。", author: "苏格拉底" },
+    { text: "吾爱吾师，吾更爱真理。", author: "亚里士多德" },
+    { text: "人是政治的动物。", author: "亚里士多德" },
+    { text: "幸福不是奖赏，而是结果；苦难不是惩罚，而是报应。", author: "爱比克泰德" },
+    { text: "生命在于运动。", author: "伏尔泰" },
+    { text: "天才就是百分之一的灵感加百分之九十九的汗水。", author: "爱迪生" },
+    { text: "失败是成功之母。", author: "爱迪生" },
+    { text: "天才是百分之一的灵感，百分之九十九的汗水。", author: "爱迪生" },
+    { text: "想象力比知识更重要。", author: "爱因斯坦" },
+    { text: "提出一个问题往往比解决一个问题更重要。", author: "爱因斯坦" },
+    { text: "我没有什么特别的才能，不过喜欢寻根究底地追究问题罢了。", author: "爱因斯坦" },
+    { text: "科学的灵感，决不是坐等可以等来的。", author: "爱因斯坦" },
+    { text: "学习知识要善于思考，思考，再思考。", author: "爱因斯坦" },
+    { text: "每个人都有一定的理想，这种理想决定着他的努力和判断的方向。", author: "爱因斯坦" },
+    { text: "人只有献身于社会，才能找出那短暂而有风险的生命的意义。", author: "爱因斯坦" },
+    { text: "成功=艰苦劳动+正确方法+少说空话。", author: "爱因斯坦" },
+    { text: "人只有献身社会，才能找出那短暂而有风险的生命的意义。", author: "爱因斯坦" },
+    { text: "一个人的价值，应该看他贡献什么，而不应当看他取得什么。", author: "爱因斯坦" },
+    { text: "生活总是用自己不成文的法律支配着人类。", author: "高尔基" },
+    { text: "书籍是人类进步的阶梯。", author: "高尔基" },
+    { text: "我扑在书上，就像饥饿的人扑在面包上。", author: "高尔基" },
+    { text: "天才出于勤奋。", author: "高尔基" },
+    { text: "时间是最公平合理的，它从不多给谁一份。", author: "高尔基" },
+    { text: "你要记得，永远要愉快地多给别人，少从别人那里拿取。", author: "高尔基" },
+    { text: "热爱书吧——这是知识的泉源。", author: "高尔基" },
+    { text: "青春是一个普通的名称，它是幸福美好的，但它也充满着艰苦的磨炼。", author: "高尔基" },
+    { text: "人的知识愈广，人的本身也愈臻完善。", author: "高尔基" },
+    { text: "没有什么比时间更具有说服力了，因为时间无需通知我们就可以改变一切。", author: "高尔基" },
+    { text: "书是人类进步的阶梯。", author: "高尔基" },
+    { text: "劳动是世界上一切欢乐和一切美好事情的源泉。", author: "高尔基" },
+    { text: "不要慨叹生活的痛苦！慨叹是弱者。", author: "高尔基" },
+    { text: "生命，那是自然付给人类去雕琢的宝石。", author: "诺贝尔" },
+    { text: "传播知识就是播种幸福。", author: "诺贝尔" },
+    { text: "人生最大的快乐不在于占有什么，而在于追求什么的过程中。", author: "诺贝尔" },
+    { text: "我是世界的公民，应为人类而生。", author: "诺贝尔" },
+    { text: "成功之花，人们往往惊羡它现时的明艳，然而当初，它的芽儿却浸透了奋斗的泪泉，洒满了牺牲的血雨。", author: "冰心" },
+    { text: "墙角的花！你孤芳自赏时天地便小了。", author: "冰心" },
+    { text: "爱在左，同情在右，走在生命路的两旁，随时撒种，随时开花。", author: "冰心" },
+    { text: "世界上若没有女人，这世界至少要失去十分之五的真、十分之六的善、十分之七的美。", author: "冰心" },
+    { text: "冠盖满京华，斯人独憔悴。", author: "冰心" },
+    { text: "成功的花，人们只惊羡她现时的明艳！然而当初她的芽儿，浸透了奋斗的泪泉，洒遍了牺牲的血雨。", author: "冰心" },
+    { text: "横眉冷对千夫指，俯首甘为孺子牛。", author: "鲁迅" },
+    { text: "其实地上本没有路，走的人多了，也便成了路。", author: "鲁迅" },
+    { text: "时间就像海绵里的水，只要愿挤，总还是有的。", author: "鲁迅" },
+    { text: "不在沉默中爆发，就在沉默中灭亡。", author: "鲁迅" },
+    { text: "我向来不惮以最坏的恶意揣测中国人。", author: "鲁迅" },
+    { text: "哀其不幸，怒其不争。", author: "鲁迅" },
+    { text: "哪里有天才，我是把别人喝咖啡的工夫都用在了工作上了。", author: "鲁迅" },
+    { text: "真的猛士，敢于直面惨淡的人生，敢于正视淋漓的鲜血。", author: "鲁迅" },
+    { text: "寄意寒星荃不察，我以我血荐轩辕。", author: "鲁迅" },
+    { text: "唯有民魂是值得宝贵的，唯有他发扬起来，中国才有真进步。", author: "鲁迅" },
+    { text: "读书无嗜好，就能尽其多。不先泛览群书，则会无所适从或失之偏好，广然后深，博然后专。", author: "鲁迅" },
+    { text: "希望本无所谓有，也无所谓无，这就像地上的路，其实地上本没有路，走的人多了，也便成了路。", author: "鲁迅" },
+    { text: "时间就是性命。无端的空耗别人的时间，其实是无异于谋财害命的。", author: "鲁迅" },
+    { text: "从来如此，便对么？", author: "鲁迅" },
+    { text: "度尽劫波兄弟在，相逢一笑泯恩仇。", author: "鲁迅" },
+    { text: "人生最苦痛的是梦醒了无路可走。", author: "鲁迅" },
+    { text: "自由的第一个前提就是自治。", author: "鲁迅" },
+    { text: "人必须生活着，爱才有所附丽。", author: "鲁迅" },
+    { text: "所谓天才，只不过是把别人喝咖啡的功夫都用在工作上了。", author: "鲁迅" },
+    { text: "谦虚使人进步，骄傲使人落后。", author: "毛泽东" },
+    { text: "世上无难事，只要肯登攀。", author: "毛泽东" },
+    { text: "为人民服务。", author: "毛泽东" },
+    { text: "星星之火，可以燎原。", author: "毛泽东" },
+    { text: "一切反动派都是纸老虎。", author: "毛泽东" },
+    { text: "人不犯我，我不犯人；人若犯我，我必犯人。", author: "毛泽东" },
+    { text: "好好学习，天天向上。", author: "毛泽东" },
+    { text: "数风流人物，还看今朝。", author: "毛泽东" },
+    { text: "不到长城非好汉。", author: "毛泽东" },
+    { text: "雄关漫道真如铁，而今迈步从头越。", author: "毛泽东" },
+    { text: "红军不怕远征难，万水千山只等闲。", author: "毛泽东" },
+    { text: "天若有情天亦老，人间正道是沧桑。", author: "毛泽东" },
+    { text: "一万年太久，只争朝夕。", author: "毛泽东" },
+    { text: "为中华之崛起而读书。", author: "周恩来" },
+    { text: "为中华崛起而读书。", author: "周恩来" },
+    { text: "面壁十年图破壁，难酬蹈海亦英雄。", author: "周恩来" },
+    { text: "大江歌罢掉头东，邃密群科济世穷。", author: "周恩来" },
+    { text: "我们要实现农业现代化、工业现代化、国防现代化和科学技术现代化。", author: "周恩来" },
+    { text: "我是中国人民的儿子，我深情地爱着我的祖国和人民。", author: "邓小平" },
+    { text: "发展才是硬道理。", author: "邓小平" },
+    { text: "不管黑猫白猫，捉到老鼠就是好猫。", author: "邓小平" },
+    { text: "科学技术是第一生产力。", author: "邓小平" },
+    { text: "摸着石头过河。", author: "邓小平" },
+    { text: "空谈误国，实干兴邦。", author: "邓小平" },
+    { text: "贫穷不是社会主义。", author: "邓小平" },
+    { text: "教育要面向现代化，面向世界，面向未来。", author: "邓小平" },
+    { text: "我是中国人民的儿子。", author: "邓小平" },
+    { text: "一寸光阴一寸金，寸金难买寸光阴。", author: "谚语" },
+    { text: "书山有路勤为径，学海无涯苦作舟。", author: "韩愈" },
+    { text: "业精于勤，荒于嬉；行成于思，毁于随。", author: "韩愈" },
+    { text: "师者，所以传道受业解惑也。", author: "韩愈" },
+    { text: "世有伯乐，然后有千里马。千里马常有，而伯乐不常有。", author: "韩愈" },
+    { text: "不鸣则已，一鸣惊人。", author: "韩非子" },
+    { text: "千里之堤，溃于蚁穴。", author: "韩非子" },
+    { text: "以子之矛，攻子之盾。", author: "韩非子" },
+    { text: "塞翁失马，焉知非福。", author: "《淮南子》" },
+    { text: "风马牛不相及。", author: "《左传》" },
+    { text: "多行不义必自毙。", author: "《左传》" },
+    { text: "人谁无过？过而能改，善莫大焉。", author: "《左传》" },
+    { text: "皮之不存，毛将焉附？", author: "《左传》" },
+    { text: "居安思危，思则有备，有备无患。", author: "《左传》" },
+    { text: "人非圣贤，孰能无过。", author: "《左传》" },
+    { text: "亡羊补牢，未为迟也。", author: "《战国策》" },
+    { text: "鹬蚌相争，渔翁得利。", author: "《战国策》" },
+    { text: "画蛇添足，多此一举。", author: "《战国策》" },
+    { text: "狐假虎威。", author: "《战国策》" },
+    { text: "狡兔三窟。", author: "《战国策》" },
+    { text: "士为知己者死，女为悦己者容。", author: "《战国策》" },
+    { text: "前事不忘，后事之师。", author: "《战国策》" },
+    { text: "见义不为，非勇也。", author: "《论语》" },
+    { text: "精诚所至，金石为开。", author: "《后汉书》" },
+    { text: "有志者，事竟成。", author: "《后汉书》" },
+    { text: "投笔从戎。", author: "《后汉书》" },
+    { text: "不入虎穴，焉得虎子。", author: "《后汉书》" },
+    { text: "失之东隅，收之桑榆。", author: "《后汉书》" },
+    { text: "天下兴亡，匹夫有责。", author: "顾炎武" },
+    { text: "海纳百川，有容乃大。", author: "林则徐" },
+    { text: "壁立千仞，无欲则刚。", author: "林则徐" },
+    { text: "落红不是无情物，化作春泥更护花。", author: "龚自珍" },
+    { text: "我劝天公重抖擞，不拘一格降人才。", author: "龚自珍" },
+    { text: "江山代有才人出，各领风骚数百年。", author: "赵翼" },
+    { text: "长风破浪会有时，直挂云帆济沧海。", author: "李白" },
+    { text: "书到用时方恨少，事非经过不知难。", author: "陆游" },
+    { text: "纸上得来终觉浅，绝知此事要躬行。", author: "陆游" },
+    { text: "天下事以难而废者十之一，以惰而废者十之九。", author: "颜之推" },
+    { text: "与朋友交，言而有信。", author: "《论语》" },
+    { text: "有朋自远方来，不亦乐乎？", author: "《论语》" },
+    { text: "四海之内皆兄弟。", author: "《论语》" },
+    { text: "君子成人之美，不成人之恶。", author: "《论语》" },
+    { text: "见贤思齐焉，见不贤而内自省也。", author: "《论语》" },
+    { text: "岁寒，然后知松柏之后凋也。", author: "《论语》" },
+    { text: "仁者见仁，智者见智。", author: "《易经》" },
+    { text: "自强不息，厚德载物。", author: "《易经》" },
+    { text: "物以类聚，人以群分。", author: "《易经》" },
+    { text: "穷则变，变则通，通则久。", author: "《易经》" },
+    { text: "君子藏器于身，待时而动。", author: "《易经》" },
+    { text: "天行健，君子以自强不息。", author: "《易经》" },
+    { text: "一阴一阳之谓道。", author: "《易经》" },
+    { text: "仁者爱人，有礼者敬人。", author: "《孟子》" },
+    { text: "不以规矩，不能成方圆。", author: "《孟子》" },
+    { text: "尽信书，则不如无书。", author: "《孟子》" },
+    { text: "人之相识，贵在相知，人之相知，贵在知心。", author: "《孟子》" },
+    { text: "爱人者，人恒爱之；敬人者，人恒敬之。", author: "《孟子》" },
+    { text: "登泰山而小天下。", author: "《孟子》" },
+    { text: "凡事预则立，不预则废。", author: "《礼记》" },
+    { text: "玉不琢，不成器；人不学，不知道。", author: "《礼记》" },
+    { text: "一张一弛，文武之道。", author: "《礼记》" },
+    { text: "学无止境。", author: "《礼记》" },
+    { text: "学然后知不足，教然后知困。", author: "《礼记》" },
+    { text: "教学相长。", author: "《礼记》" },
+    { text: "大道之行也，天下为公。", author: "《礼记》" },
+    { text: "青出于蓝而胜于蓝。", author: "《荀子》" },
+    { text: "锲而舍之，朽木不折；锲而不舍，金石可镂。", author: "《荀子》" },
+    { text: "骐骥一跃，不能十步；驽马十驾，功在不舍。", author: "《荀子》" },
+    { text: "冰，水为之，而寒于水。", author: "《荀子》" },
+    { text: "木受绳则直，金就砺则利。", author: "《荀子》" },
+    { text: "前车之鉴。", author: "《汉书》" },
+    { text: "水至清则无鱼，人至察则无徒。", author: "《汉书》" },
+    { text: "临渊羡鱼，不如退而结网。", author: "《汉书》" },
+    { text: "读万卷书，行万里路。", author: "刘彝" },
+    { text: "读万卷书，不如行万里路。", author: "刘彝" },
+    { text: "千里之行，始于足下。", author: "《老子》" },
+    { text: "知足者富。", author: "《老子》" },
+    { text: "知人者智，自知者明。", author: "《老子》" },
+    { text: "大巧若拙，大辩若讷。", author: "《老子》" },
+    { text: "信言不美，美言不信。", author: "《老子》" },
+    { text: "善者不辩，辩者不善。", author: "《老子》" },
+    { text: "知者不言，言者不知。", author: "《老子》" },
+    { text: "天之道，损有余而补不足。", author: "《老子》" },
+    { text: "飘风不终朝，骤雨不终日。", author: "《老子》" },
+    { text: "道常无为而无不为。", author: "《老子》" },
+    { text: "将欲取之，必先予之。", author: "《老子》" },
+    { text: "庄周梦蝶。", author: "《庄子》" },
+    { text: "朝三暮四。", author: "《庄子》" },
+    { text: "望洋兴叹。", author: "《庄子》" },
+    { text: "井底之蛙。", author: "《庄子》" },
+    { text: "邯郸学步。", author: "《庄子》" },
+    { text: "越俎代庖。", author: "《庄子》" },
+    { text: "螳臂当车。", author: "《庄子》" },
+    { text: "东施效颦。", author: "《庄子》" },
+    { text: "管中窥豹，可见一斑。", author: "《世说新语》" },
+    { text: "望梅止渴。", author: "《世说新语》" },
+    { text: "才高八斗。", author: "《世说新语》" },
+    { text: "七步成诗。", author: "《世说新语》" },
+    { text: "入木三分。", author: "《世说新语》" },
+    { text: "洛阳纸贵。", author: "《晋书》" },
+    { text: "枕戈待旦。", author: "《晋书》" },
+    { text: "闻鸡起舞。", author: "《晋书》" },
+    { text: "投鞭断流。", author: "《晋书》" },
+    { text: "草木皆兵。", author: "《晋书》" },
+    { text: "风声鹤唳。", author: "《晋书》" },
+    { text: "东山再起。", author: "《晋书》" },
+    { text: "三人成虎。", author: "《战国策》" },
+    { text: "画龙点睛。", author: "《历代名画记》" },
+    { text: "破镜重圆。", author: "《本事诗》" },
+    { text: "司空见惯。", author: "《本事诗》" },
+    { text: "人面桃花。", author: "《本事诗》" },
+    { text: "青梅竹马。", author: "李白" },
+    { text: "两小无猜。", author: "李白" },
+    { text: "破釜沉舟。", author: "《史记》" },
+    { text: "四面楚歌。", author: "《史记》" },
+    { text: "无颜见江东父老。", author: "《史记》" },
+    { text: "完璧归赵。", author: "《史记》" },
+    { text: "负荆请罪。", author: "《史记》" },
+    { text: "纸上谈兵。", author: "《史记》" },
+    { text: "卧薪尝胆。", author: "《史记》" },
+    { text: "鸟尽弓藏，兔死狗烹。", author: "《史记》" },
+    { text: "毛遂自荐。", author: "《史记》" },
+    { text: "一言九鼎。", author: "《史记》" },
+    { text: "萧规曹随。", author: "《史记》" },
+    { text: "约法三章。", author: "《史记》" },
+    { text: "背水一战。", author: "《史记》" },
+    { text: "多多益善。", author: "《史记》" },
+    { text: "成也萧何，败也萧何。", author: "《史记》" },
+    { text: "愚公移山。", author: "《列子》" },
+    { text: "夸父逐日。", author: "《山海经》" },
+    { text: "精卫填海。", author: "《山海经》" },
+    { text: "女娲补天。", author: "《淮南子》" },
+    { text: "后羿射日。", author: "《淮南子》" },
+    { text: "嫦娥奔月。", author: "《淮南子》" },
+    { text: "大禹治水。", author: "《山海经》" },
+    { text: "叶公好龙。", author: "《新序》" },
+    { text: "杯弓蛇影。", author: "《风俗通义》" },
+    { text: "掩耳盗铃。", author: "《吕氏春秋》" },
+    { text: "刻舟求剑。", author: "《吕氏春秋》" },
+    { text: "守株待兔。", author: "《韩非子》" },
+    { text: "自相矛盾。", author: "《韩非子》" },
+    { text: "滥竽充数。", author: "《韩非子》" },
+    { text: "买椟还珠。", author: "《韩非子》" },
+    { text: "郑人买履。", author: "《韩非子》" },
+    { text: "削足适履。", author: "《淮南子》" },
+    { text: "杞人忧天。", author: "《列子》" },
+    { text: "歧路亡羊。", author: "《列子》" },
+    { text: "疑邻盗斧。", author: "《吕氏春秋》" },
+    { text: "盲人摸象。", author: "《涅槃经》" },
+    { text: "对牛弹琴。", author: "《弘明集》" },
+    { text: "打草惊蛇。", author: "《南唐近事》" },
+    { text: "画蛇添足。", author: "《战国策》" },
+    { text: "守口如瓶。", author: "《癸辛杂识》" },
+    { text: "纸上谈兵。", author: "《史记》" },
+    { text: "闭门造车。", author: "《中庸》" },
+    { text: "夜郎自大。", author: "《史记》" },
+    { text: "揠苗助长。", author: "《孟子》" },
+    { text: "杯水车薪。", author: "《孟子》" },
+    { text: "五十步笑百步。", author: "《孟子》" },
+    { text: "始作俑者。", author: "《孟子》" },
+    { text: "缘木求鱼。", author: "《孟子》" },
+    { text: "明察秋毫，不见舆薪。", author: "《孟子》" },
+    { text: "左右逢源。", author: "《孟子》" },
+    { text: "一暴十寒。", author: "《孟子》" },
+    { text: "专心致志。", author: "《孟子》" },
+    { text: "以邻为壑。", author: "《孟子》" },
+    { text: "好为人师。", author: "《孟子》" },
+    { text: "独善其身。", author: "《孟子》" },
+    { text: "与人为善。", author: "《孟子》" },
+    { text: "舍生取义。", author: "《孟子》" },
+    { text: "君子不器。", author: "《论语》" },
+    { text: "敏而好学，不耻下问。", author: "《论语》" },
+    { text: "不耻下问。", author: "《论语》" },
+    { text: "举一反三。", author: "《论语》" },
+    { text: "闻一知十。", author: "《论语》" },
+    { text: "因材施教。", author: "《论语》" },
+    { text: "有教无类。", author: "《论语》" },
+    { text: "诲人不倦。", author: "《论语》" },
+    { text: "学而不厌。", author: "《论语》" },
+    { text: "后生可畏。", author: "《论语》" },
+    { text: "当仁不让。", author: "《论语》" },
+    { text: "任重道远。", author: "《论语》" },
+    { text: "成人之美。", author: "《论语》" },
+    { text: "见义勇为。", author: "《论语》" },
+    { text: "三思而行。", author: "《论语》" },
+    { text: "不亦乐乎。", author: "《论语》" },
+    { text: "从心所欲。", author: "《论语》" },
+    { text: "血气方刚。", author: "《论语》" },
+    { text: "察言观色。", author: "《论语》" },
+    { text: "名正言顺。", author: "《论语》" },
+    { text: "待价而沽。", author: "《论语》" },
+    { text: "怨天尤人。", author: "《论语》" },
+    { text: "手足无措。", author: "《论语》" },
+    { text: "慎终追远。", author: "《论语》" },
+    { text: "既往不咎。", author: "《论语》" },
+    { text: "尽善尽美。", author: "《论语》" },
+    { text: "文质彬彬。", author: "《论语》" },
+    { text: "是可忍，孰不可忍。", author: "《论语》" },
+    { text: "听其言而观其行。", author: "《论语》" },
+    { text: "逝者如斯。", author: "《论语》" },
+    { text: "华而不实。", author: "《左传》" },
+    { text: "众志成城。", author: "《国语》" },
+    { text: "众口铄金。", author: "《国语》" },
+    { text: "防民之口，甚于防川。", author: "《国语》" },
+    { text: "高枕无忧。", author: "《战国策》" },
+    { text: "门庭若市。", author: "《战国策》" },
+    { text: "画龙点睛。", author: "张彦远" },
+    { text: "望尘莫及。", author: "《后汉书》" },
+    { text: "脍炙人口。", author: "《孟子》" },
+    { text: "贪小失大。", author: "《吕氏春秋》" },
+    { text: "因噎废食。", author: "《吕氏春秋》" },
+    { text: "竭泽而渔。", author: "《吕氏春秋》" },
+    { text: "流水不腐，户枢不蠹。", author: "《吕氏春秋》" },
+    { text: "刻舟求剑。", author: "《吕氏春秋》" },
+    { text: "一字千金。", author: "《吕氏春秋》" },
+    { text: "奇货可居。", author: "《史记》" },
+    { text: "一鸣惊人。", author: "《史记》" },
+    { text: "运筹帷幄。", author: "《史记》" },
+    { text: "先发制人。", author: "《汉书》" },
+    { text: "后来居上。", author: "《史记》" },
+    { text: "门可罗雀。", author: "《史记》" },
+    { text: "桃李满天下。", author: "《韩诗外传》" },
+    { text: "事半功倍。", author: "《孟子》" },
+    { text: "事倍功半。", author: "《孟子》" },
+    { text: "因地制宜。", author: "《吴越春秋》" },
+    { text: "兼听则明，偏信则暗。", author: "《资治通鉴》" },
+    { text: "口蜜腹剑。", author: "《资治通鉴》" },
+    { text: "请君入瓮。", author: "《资治通鉴》" },
+    { text: "桃李不言，下自成蹊。", author: "《史记》" },
+    { text: "如火如荼。", author: "《国语》" },
+    { text: "一发千钧。", author: "《汉书》" },
+    { text: "一尘不染。", author: "《景德传灯录》" },
+    { text: "千钧一发。", author: "《汉书》" },
+    { text: "一箭双雕。", author: "《北史》" },
+    { text: "双管齐下。", author: "《图画见闻志》" },
+    { text: "南柯一梦。", author: "《南柯太守传》" },
+    { text: "黄粱美梦。", author: "《枕中记》" },
+    { text: "画饼充饥。", author: "《三国志》" },
+    { text: "望梅止渴。", author: "《世说新语》" },
+    { text: "胸有成竹。", author: "《文与可画筼筜谷偃竹记》" },
+    { text: "水滴石穿。", author: "《汉书》" },
+    { text: "铁杵磨成针。", author: "《方舆胜览》" },
+    { text: "只要功夫深，铁杵磨成针。", author: "谚语" },
+    { text: "磨杵成针。", author: "《潜确居类书》" },
+    { text: "悬梁刺股。", author: "《战国策》" },
+    { text: "凿壁偷光。", author: "《西京杂记》" },
+    { text: "囊萤映雪。", author: "《晋书》" },
+    { text: "牛角挂书。", author: "《新唐书》" },
+    { text: "韦编三绝。", author: "《史记》" },
+    { text: "程门立雪。", author: "《宋史》" },
+    { text: "孜孜不倦。", author: "《尚书》" },
+    { text: "废寝忘食。", author: "《论语》" },
+    { text: "手不释卷。", author: "《三国志》" },
+    { text: "博览群书。", author: "《周书》" },
+    { text: "学富五车。", author: "《庄子》" },
+    { text: "汗牛充栋。", author: "《陆文通先生墓表》" },
+    { text: "博闻强记。", author: "《礼记》" },
+    { text: "融会贯通。", author: "《朱子全书》" },
+    { text: "举一反三。", author: "《论语》" },
+    { text: "触类旁通。", author: "《周易》" },
+    { text: "循序渐进。", author: "《论语》" },
+    { text: "由浅入深。", author: "《朱子语类》" },
+    { text: "熟读深思。", author: "《朱子语类》" },
+    { text: "厚积薄发。", author: "《稼说送张琥》" },
+    { text: "豁然开朗。", author: "《桃花源记》" },
+    { text: "茅塞顿开。", author: "《孟子》" },
+    { text: "恍然大悟。", author: "《五灯会元》" },
+    { text: "柳暗花明。", author: "《游山西村》" },
   ];
 
-   // 获取名言数据 - 直接使用本地备份数据以避免API错误
+   // 获取名言数据 - 带淡入淡出动画
    const fetchQuote = () => {
-     setQuoteLoading(true);
-     
-     // 短暂延迟模拟加载过程
-     setTimeout(() => {
-       // 使用随机本地备份名言
-       const randomIndex = Math.floor(Math.random() * backupQuotes.length);
-       setCurrentQuote(backupQuotes[randomIndex]);
-       setQuoteLoading(false);
-     }, 500);
+       // 先淡出
+       setQuoteVisible(false);
+       
+       // 等待淡出完成后再切换内容并淡入
+       setTimeout(() => {
+           const randomIndex = Math.floor(Math.random() * backupQuotes.length);
+           setCurrentQuote(backupQuotes[randomIndex]);
+           setQuoteVisible(true);
+       }, 300); // 300ms 淡出时间
    };
   
    // 初始获取名言并设置自动刷新
@@ -384,16 +1031,11 @@ const socialItems: SocialItem[] = [
                onClick={fetchQuote}
                title="点击切换名言"
              >
-               <p className="text-white/90 text-base md:text-lg italic leading-relaxed">
-                  "{quoteLoading ? '加载中...' : currentQuote.text}"
-                  {quoteLoading && (
-                    <div className="inline-block ml-2 animate-spin">
-                      <i className="fa-solid fa-circle-notch fa-spin"></i>
-                    </div>
-                  )}
+               <p className={`text-white/90 text-base md:text-lg italic leading-relaxed transition-all duration-300 ${quoteVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+                  「  {currentQuote.text}  」
                </p>
-               <p className="text-white/70 text-sm mt-3 text-right">
-                 - {quoteLoading ? '获取中...' : currentQuote.author}
+               <p className={`text-white/70 text-sm mt-3 text-right transition-all duration-300 ${quoteVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+                 - {currentQuote.author}
                </p>
 
              </div>
@@ -404,9 +1046,13 @@ const socialItems: SocialItem[] = [
             <div className="grid grid-cols-1 gap-4 mb-8">
               {/* 日期时间卡片 */}
               <div className="bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 w-full shadow-md">
-                <p className="text-white/70 text-sm mb-1">{currentDate}</p>
-                <p className="text-white text-3xl font-mono font-light">{formatTime(currentTime)}</p>
-
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-white/70 text-sm mb-1">{currentDate}</p>
+                    <p className="text-white text-3xl font-mono font-light">{formatTime(currentTime)}</p>
+                  </div>
+                  <MusicPlayer />
+                </div>
               </div>
            </div>
  
@@ -552,70 +1198,95 @@ const socialItems: SocialItem[] = [
                   ></div>
                   
                   {/* 弹窗内容 */}
-                  <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden">
+                  <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-6 w-full max-w-md mx-auto shadow-2xl">
                     {/* 标题栏 */}
-                    <div className="flex justify-between items-center p-4 border-b border-gray-200">
-                      <h3 className="text-xl font-bold text-gray-800">更新日志</h3>
-                      <button 
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-white text-xl font-semibold">更新日志</h3>
+                      <button
                         onClick={() => setIsUpdateLogOpen(false)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+                        className="text-white/60 hover:text-white transition-colors"
                         aria-label="关闭"
                       >
-                        <i className="fa-solid fa-times"></i>
+                        <i className="fa-solid fa-times text-lg"></i>
                       </button>
                     </div>
                     
                     {/* 内容区域 */}
-                    <div className="p-6 max-h-[60vh] overflow-y-auto">
+                    <div className="max-h-[60vh] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      <style>{`
+                        div[style*="scrollbar-width"]::-webkit-scrollbar {
+                          display: none;
+                        }
+                      `}</style>
                       {/* 最新更新 */}
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
-                             <div className="w-3 h-10 bg-blue-500 rounded-l mr-4"></div>
-                             <h4 className="text-lg font-semibold text-gray-800">2026.1.29 更新 v2.4</h4>
+                             <div className="w-3 h-10 bg-green-500 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2026.3.14 更新 v3.0</h4>
                            </div>
-                           <ul className="ml-7 space-y-2 text-gray-600">
+                           <ul className="ml-7 space-y-2 text-white/70">
                              <li className="flex items-start">
-                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>AI工具焕新</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>名人名言优化</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>修复了一些已知问题</span>
+                             </li>
+                           </ul>
+                         </div>
+                         <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2026.1.29 更新 v2.4</h4>
+                           </div>
+                           <ul className="ml-7 space-y-2 text-white/70">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                                <span>增加了假期日历</span>
                              </li>
                              <li className="flex items-start">
-                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                                <span>修复了一些已知问题</span>
                              </li>
                            </ul>
                          </div>
                          <div className="mb-8">  
                             <div className="flex items-center mb-3">
-                              <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
-                              <h4 className="text-lg font-semibold text-gray-800">2025.8.27 更新 v2.2</h4>
+                              <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
+                              <h4 className="text-lg font-semibold text-white">2025.8.27 更新 v2.2</h4>
                             </div>
-                           <ul className="ml-7 space-y-2 text-gray-600">
+                           <ul className="ml-7 space-y-2 text-white/70">
                              <li className="flex items-start">
-                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                                <span>新增了一些内容</span>
                              </li>
                              <li className="flex items-start">
-                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                                <span>修复了一些已知问题</span>
                              </li>
                            </ul>
                          </div>
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
-                             <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
-                             <h4 className="text-lg font-semibold text-gray-800">2025.8.11 更新 v2.1</h4>
+                             <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2025.8.11 更新 v2.1</h4>
                           </div>
-                          <ul className="ml-7 space-y-2 text-gray-600">
+                          <ul className="ml-7 space-y-2 text-white/70">
                             <li className="flex items-start">
-                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                               <span>ai功能ui界面大调整</span>
                             </li>
                             <li className="flex items-start">
-                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                               <span>页面更加美观</span>
                             </li>
                             <li className="flex items-start">
-                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                              <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                               <span>修复了一些已知问题，提升体验感</span>
                             </li>
                           </ul>
@@ -624,20 +1295,20 @@ const socialItems: SocialItem[] = [
                       {/* 历史更新 */}
                       <div className="mb-8">  
                         <div className="flex items-center mb-3">
-                          <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
-                          <h4 className="text-lg font-semibold text-gray-800">2025.8.6 更新 v2.0</h4>
+                          <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
+                          <h4 className="text-lg font-semibold text-white">2025.8.6 更新 v2.0</h4>
                         </div>
-                        <ul className="ml-7 space-y-2 text-gray-600">
+                        <ul className="ml-7 space-y-2 text-white/70">
                           <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                             <span>新增传送门等功能</span>
                           </li>
                           <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                             <span>我的搜索页也上线啦，新增跳转搜索页按钮</span>
                           </li>
                           <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                             <span>修复了一些已知问题</span>
                           </li>
                         </ul>
@@ -646,12 +1317,12 @@ const socialItems: SocialItem[] = [
                       {/* 初始版本 */}
                       <div>  
                         <div className="flex items-center mb-3">
-                          <div className="w-3 h-10 bg-gray-300 rounded-l mr-4"></div>
-                          <h4 className="text-lg font-semibold text-gray-800">2025.8.4 发布 v1.0</h4>
+                          <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
+                          <h4 className="text-lg font-semibold text-white">2025.8.4 发布 v1.0</h4>
                         </div>
-                        <ul className="ml-7 space-y-2 text-gray-600">
+                        <ul className="ml-7 space-y-2 text-white/70">
                           <li className="flex items-start">
-                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-gray-400"></i>
+                            <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
                             <span>网站上线啦</span>
                           </li>
                         </ul>
@@ -941,122 +1612,10 @@ const socialItems: SocialItem[] = [
            )}
            
             {/* AI工具模态框 */}
-            {isAIToolsModalOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                {/* 背景遮罩 */}
-                <div 
-                  className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                  onClick={() => setIsAIToolsModalOpen(false)}
-                ></div>
-                
-                {/* 模态框内容 */}
-                    <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-6 w-full max-w-4xl shadow-2xl">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-white text-xl font-semibold">AI工具</h3>
-                    <button 
-                      onClick={() => setIsAIToolsModalOpen(false)}
-                      className="text-white/60 hover:text-white transition-colors"
-                      aria-label="关闭"
-                    >
-                      <i className="fa-solid fa-times text-lg"></i>
-                    </button>
-                  </div>
-                   
-                  <div className="space-y-6">
-                    <div className="text-white text-lg font-medium mb-2">推荐</div>
-                     <div className="space-y-2">
-                       <a 
-                         href="https://www.doubao.com" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
-                         onClick={() => setIsAIToolsModalOpen(false)}
-                         title="豆包AI"
-                       >
-                          <i className="fa-solid fa-robot mr-3"></i>豆包（日常完全够用，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
-                       </a>
-                       
-                       <a 
-                         href="https://www.tongyi.com" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
-                         onClick={() => setIsAIToolsModalOpen(false)}
-                         title="通义千问"
-                       >                        
-                          <i className="fa-solid fa-comment-dots mr-3"></i>通义千问（日常也够用，模型多，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
-                       </a>
-                       
-                       <a 
-                         href="https://space.coze.cn" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
-                         onClick={() => setIsAIToolsModalOpen(false)}
-                         title="扣子空间"
-                       >
-                          <i className="fa-solid fa-cube mr-3"></i>扣子（较高难度需要用到，有很多ai专家和插件，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                       </a>
-                       
-                       <a 
-                         href="https://www.trae.cn" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
-                         onClick={() => setIsAIToolsModalOpen(false)}
-                         title="TRAE"
-                       >
-                           <i className="fa-solid fa-cogs mr-3"></i>trae（编程专用，效果好，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i>）
-                        </a>
-
-                       <a 
-                         href="https://www.haisnap.com" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
-                         onClick={() => setIsAIToolsModalOpen(false)}
-                         title="haisnap"
-                       >
-                           <i className="fa-solid fa-code mr-3"></i>haisnap（基本主要与编程有关，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                         </a>
-
-                        <a 
-                          href="https://autoglm.zhipuai.cn/" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="block w-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium"
-                          onClick={() => setIsAIToolsModalOpen(false)}
-                          title="autoglm"
-                        >
-                           <i className="fa-solid fa-robot mr-3"></i>autoglm（可以自己操控电脑/手机，自己上各大平台搜索，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                        </a>
-
-                         <div className="text-white text-lg font-medium mb-2">不太推荐</div>
-
-                       <a 
-                         href="https://www.deepseek.com" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700 hover:bg-gray-600 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50 cursor-not-allowed"
-                         title="DeepSeek"
-                       >
-                          <i className="fa-solid fa-microchip mr-3"></i>DeepSeek（错误多，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                       </a>
-                       
-                       <a 
-                         href="https://chatgpt.com" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="block w-full bg-gray-700 hover:bg-gray-600 transition-colors px-6 py-4 rounded-lg text-white text-left font-medium opacity-50"
-                         title="ChatGPT"
-                       >
-                          <i className="fa-solid fa-brain mr-3"></i>ChatGPT（需要魔法嘿嘿，推荐指数 <i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star text-yellow-400"></i><i className="fa-solid fa-star-half-alt text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i><i className="fa-regular fa-star text-yellow-400"></i>）
-                       </a>
-                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <AITools 
+              isOpen={isAIToolsModalOpen} 
+              onClose={() => setIsAIToolsModalOpen(false)} 
+            />
             
                </main>
 
@@ -1066,8 +1625,19 @@ const socialItems: SocialItem[] = [
                 onClose={() => setIsHolidayCalendarOpen(false)} 
               />
 
-               {/* 左下角版本号 */}
-   <div className="fixed bottom-6 left-6 text-orange-300 text-4xl font-bold transform -rotate-12 z-20">v2.4</div>
+               {/* 左下角版本号 - 与版本动画无缝衔接 */}
+   <div 
+     className={`fixed bottom-6 left-6 text-4xl font-black transform -rotate-12 z-20 transition-all duration-500 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+     style={{
+       background: 'linear-gradient(to right, #fb923c, #fcd34d, #fb923c)',
+       WebkitBackgroundClip: 'text',
+       WebkitTextFillColor: 'transparent',
+       backgroundClip: 'text',
+       textShadow: '0 0 20px rgba(251, 146, 60, 0.5)',
+     }}
+   >
+     V3.0
+   </div>
 
             {/* 意见反馈弹窗 */}
             {isFeedbackModalOpen && (
@@ -1169,20 +1739,20 @@ const socialItems: SocialItem[] = [
           {/* 更新日志按钮 - 右下角固定位置 */}
            <button 
   onClick={() => window.open('https://lyjy.netlify.app', '_blank')}
-  className="fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110"
+  className={`fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
   aria-label="访问lyjy.netlify.app"
 >
   <i className="fa-solid fa-paper-plane"></i>
 </button>
            <button 
   onClick={() => setIsUpdateLogOpen(true)}
-  className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110"
+  className={`fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
   aria-label="查看更新日志"
 >
   <i className="fa-solid fa-history"></i>
 </button>
 
-          <footer className="relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm">
+          <footer className={`relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm transition-all duration-300 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <div className="container mx-auto flex justify-center space-x-6">
              {socialItems.map(item => (
                  <a 

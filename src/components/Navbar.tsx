@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';

@@ -1,3 +1,4 @@
+import React from 'react';
 import { createContext } from "react";
 
 // Define the auth context type
