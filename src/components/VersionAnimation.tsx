@@ -226,7 +226,7 @@ const VersionAnimation: React.FC<VersionAnimationProps> = ({ onComplete }) => {
             WebkitTextStroke: '2px rgba(251, 146, 60, 0.7)',
           }}
         >
-          V3.0
+          V3.1
         </motion.h1>
 
         {/* 副标题 */}
@@ -303,7 +303,7 @@ const VersionAnimation: React.FC<VersionAnimationProps> = ({ onComplete }) => {
             transition={{ duration: 14, ease: 'linear' }}
           />
         </div>
-        <p className="text-white/30 text-xs tracking-[0.3em] uppercase">Version 3.0 Release</p>
+        <p className="text-white/30 text-xs tracking-[0.3em] uppercase">Version 3.1 Release</p>
       </div>
     </div>
   );

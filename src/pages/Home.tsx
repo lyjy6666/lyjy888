@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import HolidayCalendar from '@/components/HolidayCalendar';
 import MusicPlayer from '@/components/MusicPlayer';
 import AITools from '@/components/AITools';
+import GPUTierChart from '@/components/GPUTierChart';
 
 // 定义链接数据类型
 interface LinkItem {
@@ -72,11 +73,13 @@ export default function Home() {
   const [portalCountdown, setPortalCountdown] = useState(10);
   // 假期日历模态框状态
   const [isHolidayCalendarOpen, setIsHolidayCalendarOpen] = useState(false);
+  // 显卡天梯图模态框状态
+  const [isGPUTierChartOpen, setIsGPUTierChartOpen] = useState(false);
   
   // 检测是否有任何模态框打开（用于隐藏底部元素）
   const isAnyModalOpen = isStudyModalOpen || isMovieModalOpen || isTimeCapsuleModalOpen || 
     isAIToolsModalOpen || isOtherModalOpen || isUtilityModalOpen || isFeedbackModalOpen || 
-    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen;
+    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen || isGPUTierChartOpen;
   
 
   
@@ -873,6 +876,7 @@ export default function Home() {
             { id: 9, title: '传送门', icon: 'fa-solid fa-link', url: 'https://travel.moe/go' },
 
              { id: 11, title: '假期日历', icon: 'fa-solid fa-calendar-days', url: '#' },
+             { id: 12, title: '天梯图', icon: 'fa-solid fa-chart-line', url: '#' },
              { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
        ];
       
@@ -990,7 +994,7 @@ const socialItems: SocialItem[] = [
   
          {/* 搜索框 - 位于欢迎消息下方 */}
          <div 
-           className="relative z-10 bg-black/40 backdrop-blur-md py-3 px-4 border-b border-white/10 cursor-pointer group"
+           className="relative z-10 bg-black/40 backdrop-blur-md py-1.5 px-4 border-b border-white/10 cursor-pointer group"
            onClick={() => window.location.href = 'https://lyjysearch.netlify.app'}
          >
            <div className="container mx-auto flex items-center justify-center">
@@ -998,7 +1002,7 @@ const socialItems: SocialItem[] = [
                <input
                  type="text"
                  placeholder="点击搜索..."
-                 className="w-full pl-10 pr-4 py-3 rounded-full border border-white/20 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all group-hover:border-blue-400 group-hover:bg-white/15"
+                 className="w-full pl-10 pr-4 py-2 rounded-full border border-white/20 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all group-hover:border-blue-400 group-hover:bg-white/15"
                  readOnly
                />
                <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 group-hover:text-blue-400 transition-colors"></i>
@@ -1081,6 +1085,9 @@ const socialItems: SocialItem[] = [
                             } else if (link.id === 11) {
                               // 打开假期日历模态框
                               setIsHolidayCalendarOpen(true);
+                            } else if (link.id === 12) {
+                              // 打开显卡天梯图模态框
+                              setIsGPUTierChartOpen(true);
                             } else if (link.id === 4) {
                              setIsStudyModalOpen(true);
                            } else if (link.id === 7) {
@@ -1222,6 +1229,22 @@ const socialItems: SocialItem[] = [
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
                              <div className="w-3 h-10 bg-green-500 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2026.3.19 更新 v3.1</h4>
+                           </div>
+                           <ul className="ml-7 space-y-2 text-white/70">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>增加天梯图</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>新增了一个彩蛋，等待你发现哦~</span>
+                             </li>
+                           </ul>
+                         </div>
+                         <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
                              <h4 className="text-lg font-semibold text-white">2026.3.14 更新 v3.0</h4>
                            </div>
                            <ul className="ml-7 space-y-2 text-white/70">
@@ -1625,6 +1648,12 @@ const socialItems: SocialItem[] = [
                 onClose={() => setIsHolidayCalendarOpen(false)} 
               />
 
+              {/* 显卡天梯图模态框 */}
+              <GPUTierChart 
+                isOpen={isGPUTierChartOpen} 
+                onClose={() => setIsGPUTierChartOpen(false)} 
+              />
+
                {/* 左下角版本号 - 与版本动画无缝衔接 */}
    <div 
      className={`fixed bottom-6 left-6 text-4xl font-black transform -rotate-12 z-20 transition-all duration-500 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -1636,7 +1665,7 @@ const socialItems: SocialItem[] = [
        textShadow: '0 0 20px rgba(251, 146, 60, 0.5)',
      }}
    >
-     V3.0
+     V3.1
    </div>
 
             {/* 意见反馈弹窗 */}
