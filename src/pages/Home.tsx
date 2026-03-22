@@ -5,6 +5,15 @@ import HolidayCalendar from '@/components/HolidayCalendar';
 import MusicPlayer from '@/components/MusicPlayer';
 import AITools from '@/components/AITools';
 import GPUTierChart from '@/components/GPUTierChart';
+import ScreenRecorder from '@/components/ScreenRecorder';
+import SecuritySoftware from '@/components/SecuritySoftware';
+import InputMethod from '@/components/InputMethod';
+import OfficeSoftware from '@/components/OfficeSoftware';
+import ScreenshotTool from '@/components/ScreenshotTool';
+import CompressionTool from '@/components/CompressionTool';
+import VideoPlayer from '@/components/VideoPlayer';
+import SystemCleaner from '@/components/SystemCleaner';
+import DesktopBeautify from '@/components/DesktopBeautify';
 
 // 定义链接数据类型
 interface LinkItem {
@@ -75,11 +84,33 @@ export default function Home() {
   const [isHolidayCalendarOpen, setIsHolidayCalendarOpen] = useState(false);
   // 显卡天梯图模态框状态
   const [isGPUTierChartOpen, setIsGPUTierChartOpen] = useState(false);
+  // 屏幕录制模态框状态
+  const [isScreenRecorderOpen, setIsScreenRecorderOpen] = useState(false);
+  // 安全软件模态框状态
+  const [isSecuritySoftwareOpen, setIsSecuritySoftwareOpen] = useState(false);
+  // 输入法模态框状态
+  const [isInputMethodOpen, setIsInputMethodOpen] = useState(false);
+  // 办公软件模态框状态
+  const [isOfficeSoftwareOpen, setIsOfficeSoftwareOpen] = useState(false);
+  // 其他工具模态框状态
+  const [isOtherToolsModalOpen, setIsOtherToolsModalOpen] = useState(false);
+  // 截图工具模态框状态
+  const [isScreenshotToolOpen, setIsScreenshotToolOpen] = useState(false);
+  // 压缩解压工具模态框状态
+  const [isCompressionToolOpen, setIsCompressionToolOpen] = useState(false);
+  // 本地视频播放器模态框状态
+  const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
+  // 系统清理优化工具模态框状态
+  const [isSystemCleanerOpen, setIsSystemCleanerOpen] = useState(false);
+  // 桌面美化工具模态框状态
+  const [isDesktopBeautifyOpen, setIsDesktopBeautifyOpen] = useState(false);
   
   // 检测是否有任何模态框打开（用于隐藏底部元素）
   const isAnyModalOpen = isStudyModalOpen || isMovieModalOpen || isTimeCapsuleModalOpen || 
     isAIToolsModalOpen || isOtherModalOpen || isUtilityModalOpen || isFeedbackModalOpen || 
-    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen || isGPUTierChartOpen;
+    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen || isGPUTierChartOpen || 
+    isScreenRecorderOpen || isSecuritySoftwareOpen || isInputMethodOpen || isOfficeSoftwareOpen || isOtherToolsModalOpen ||
+    isScreenshotToolOpen || isCompressionToolOpen || isVideoPlayerOpen || isSystemCleanerOpen || isDesktopBeautifyOpen;
   
 
   
@@ -1229,6 +1260,22 @@ const socialItems: SocialItem[] = [
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
                              <div className="w-3 h-10 bg-green-500 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2026.3.21 更新 v3.2</h4>
+                           </div>
+                           <ul className="ml-7 space-y-2 text-white/70">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>实用工具换新</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>修复了一些已知问题</span>
+                             </li>
+                           </ul>
+                         </div>
+                         <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
                              <h4 className="text-lg font-semibold text-white">2026.3.19 更新 v3.1</h4>
                            </div>
                            <ul className="ml-7 space-y-2 text-white/70">
@@ -1435,6 +1482,137 @@ const socialItems: SocialItem[] = [
             </div>
           )}
 
+          {/* 屏幕录制工具模态框 */}
+          <ScreenRecorder 
+            isOpen={isScreenRecorderOpen} 
+            onClose={() => setIsScreenRecorderOpen(false)} 
+          />
+
+          {/* 安全软件模态框 */}
+          <SecuritySoftware 
+            isOpen={isSecuritySoftwareOpen} 
+            onClose={() => setIsSecuritySoftwareOpen(false)} 
+          />
+
+          {/* 输入法模态框 */}
+          <InputMethod 
+            isOpen={isInputMethodOpen} 
+            onClose={() => setIsInputMethodOpen(false)} 
+          />
+
+          {/* 办公软件模态框 */}
+          <OfficeSoftware 
+            isOpen={isOfficeSoftwareOpen} 
+            onClose={() => setIsOfficeSoftwareOpen(false)} 
+          />
+
+          {/* 截图工具模态框 */}
+          <ScreenshotTool 
+            isOpen={isScreenshotToolOpen} 
+            onClose={() => setIsScreenshotToolOpen(false)} 
+          />
+
+          {/* 压缩解压工具模态框 */}
+          <CompressionTool 
+            isOpen={isCompressionToolOpen} 
+            onClose={() => setIsCompressionToolOpen(false)} 
+          />
+
+          {/* 本地视频播放器模态框 */}
+          <VideoPlayer 
+            isOpen={isVideoPlayerOpen} 
+            onClose={() => setIsVideoPlayerOpen(false)} 
+          />
+
+          {/* 系统清理优化工具模态框 */}
+          <SystemCleaner 
+            isOpen={isSystemCleanerOpen} 
+            onClose={() => setIsSystemCleanerOpen(false)} 
+          />
+
+          {/* 桌面美化工具模态框 */}
+          <DesktopBeautify 
+            isOpen={isDesktopBeautifyOpen} 
+            onClose={() => setIsDesktopBeautifyOpen(false)} 
+          />
+
+          {/* 其他工具模态框 */}
+          {isOtherToolsModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              {/* 背景遮罩 */}
+              <div 
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setIsOtherToolsModalOpen(false)}
+              ></div>
+              
+              {/* Modal content */}
+              <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col">
+                {/* Header */}
+                <div className="flex justify-between items-center p-6 border-b border-white/10">
+                  <h3 className="text-white text-xl font-semibold">其他工具</h3>
+                  <button 
+                    onClick={() => setIsOtherToolsModalOpen(false)}
+                    className="text-white/60 hover:text-white transition-colors"
+                    aria-label="关闭"
+                  >
+                    <i className="fa-solid fa-times text-lg"></i>
+                  </button>
+                </div>
+                
+                {/* 内容区域 - 可滚动 */}
+                <div className="p-6 space-y-3 overflow-y-auto flex-1">
+                  <a 
+                    href="https://calc.kafuchino.top/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                    onClick={() => setIsOtherToolsModalOpen(false)}
+                  >
+                    <i className="fa-solid fa-calculator mr-2 text-yellow-400"></i>kafuchino 函数计算器
+                    <p className="text-white/50 text-xs mt-1">强大的在线函数计算工具</p>
+                  </a>
+                  
+                  <a 
+                    href="https://wstools.top/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                    onClick={() => setIsOtherToolsModalOpen(false)}
+                  >
+                    <i className="fa-solid fa-tools mr-2 text-green-400"></i>万事通在线工具箱
+                    <p className="text-white/50 text-xs mt-1">集成多种实用小工具</p>
+                  </a>
+                  
+                  <a 
+                    href="https://www.fly63.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                    onClick={() => setIsOtherToolsModalOpen(false)}
+                  >
+                    <i className="fa-solid fa-globe mr-2 text-blue-400"></i>fly63 知识库
+                    <p className="text-white/50 text-xs mt-1">技术知识分享平台</p>
+                  </a>
+                  
+                  <a 
+                    href="https://kaifa.baidu.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-left font-medium"
+                    onClick={() => setIsOtherToolsModalOpen(false)}
+                  >
+                    <i className="fa-solid fa-code mr-2 text-purple-400"></i>百度开发者中心
+                    <p className="text-white/50 text-xs mt-1">百度官方开发者资源</p>
+                  </a>
+                </div>
+                
+                <p className="text-white/40 text-xs text-center pb-4">
+                  点击外部区域或关闭按钮可关闭
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* 学习模态框 */}
           {isStudyModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1574,60 +1752,130 @@ const socialItems: SocialItem[] = [
                ></div>
                
                {/* 模态框内容 */}
-               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-6 w-full max-w-md shadow-2xl">
-                 <div className="flex justify-between items-center mb-6">
-                   <h3 className="text-white text-xl font-semibold">实用工具</h3>
+               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 w-full max-w-4xl shadow-2xl overflow-hidden">
+                 {/* 标题栏 */}
+                 <div className="flex justify-between items-center px-8 py-4 border-b border-white/10 bg-black/30">
+                   <h3 className="text-white text-2xl font-semibold">实用工具</h3>
                    <button 
                      onClick={() => setIsUtilityModalOpen(false)}
                      className="text-white/60 hover:text-white transition-colors"
                      aria-label="关闭"
                    >
-                     <i className="fa-solid fa-times text-lg"></i>
+                     <i className="fa-solid fa-times text-2xl"></i>
                    </button>
                  </div>
                  
-                       <div className="space-y-4">
-          <a 
-            href="https://tools.kafuchino.top/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-            onClick={() => setIsUtilityModalOpen(false)}
-          >
-            <i className="fa-solid fa-wrench mr-2"></i>kafuchino工具集
-          </a>
-          <a 
-           href="https://unitools.fun/#categoryCode=image" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-           onClick={() => setIsUtilityModalOpen(false)}
-         >
-           <i className="fa-solid fa-image mr-2"></i>万事通工具箱
-         </a>
-         
-         <a 
-           href="https://fly63.com/tool/home.html" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-           onClick={() => setIsUtilityModalOpen(false)}
-         >
-           <i className="fa-solid fa-wrench mr-2"></i>fly63工具箱
-         </a>
-         
-         <a 
-           href="https://kaifa.baidu.com/" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           className="block w-full bg-white/15 hover:bg-white/25 transition-colors p-4 rounded-xl text-white text-center font-medium"
-           onClick={() => setIsUtilityModalOpen(false)}
-         >
-           <i className="fa-solid fa-code mr-2"></i>kaifa.baidu.com <span className="text-red-400">! 开发专用 !</span>
-         </a>
-       </div>
+                 {/* 工具卡片 */}
+                 <div className="p-8">
+                   {/* 第一排 */}
+                   <div className="grid grid-cols-5 gap-6 mb-6">
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsScreenRecorderOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-video text-4xl text-red-400"></i>
+                       <span className="text-white/80 text-base">屏幕录制</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsSecuritySoftwareOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-shield-halved text-4xl text-green-400"></i>
+                       <span className="text-white/80 text-base">安全软件</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsInputMethodOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-keyboard text-4xl text-blue-400"></i>
+                       <span className="text-white/80 text-base">输入法</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsOfficeSoftwareOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-briefcase text-4xl text-purple-400"></i>
+                       <span className="text-white/80 text-base">办公软件</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsScreenshotToolOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-camera text-4xl text-cyan-400"></i>
+                       <span className="text-white/80 text-base">截图工具</span>
+                     </button>
+                   </div>
+                   {/* 第二排 */}
+                   <div className="grid grid-cols-5 gap-6">
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsCompressionToolOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-file-zipper text-4xl text-amber-400"></i>
+                       <span className="text-white/80 text-base">压缩解压</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsVideoPlayerOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-play text-4xl text-pink-400"></i>
+                       <span className="text-white/80 text-base">视频播放器</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsSystemCleanerOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-broom text-4xl text-emerald-400"></i>
+                       <span className="text-white/80 text-base">系统清理</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsDesktopBeautifyOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-palette text-4xl text-violet-400"></i>
+                       <span className="text-white/80 text-base">桌面美化</span>
+                     </button>
+                     <button 
+                       onClick={() => {
+                         setIsUtilityModalOpen(false);
+                         setIsOtherToolsModalOpen(true);
+                       }}
+                       className="flex flex-col items-center gap-3 p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
+                     >
+                       <i className="fa-solid fa-toolbox text-4xl text-white/60"></i>
+                       <span className="text-white/80 text-base">其他工具</span>
+                     </button>
+                   </div>
+                 </div>
                  
-                 <p className="text-white/40 text-xs text-center mt-6">
+                 <p className="text-white/40 text-xs text-center pb-4">
                    点击外部区域或关闭按钮也可关闭
                  </p>
                </div>
@@ -1665,7 +1913,7 @@ const socialItems: SocialItem[] = [
        textShadow: '0 0 20px rgba(251, 146, 60, 0.5)',
      }}
    >
-     V3.1
+     V3.2
    </div>
 
             {/* 意见反馈弹窗 */}
