@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import HolidayCalendar from '@/components/HolidayCalendar';
 import MusicPlayer from '@/components/MusicPlayer';
@@ -14,6 +15,8 @@ import CompressionTool from '@/components/CompressionTool';
 import VideoPlayer from '@/components/VideoPlayer';
 import SystemCleaner from '@/components/SystemCleaner';
 import DesktopBeautify from '@/components/DesktopBeautify';
+import HotBoard from '@/components/HotBoard';
+import SnakeGame from '@/components/SnakeGame';
 
 // 定义链接数据类型
 interface LinkItem {
@@ -84,6 +87,12 @@ export default function Home() {
   const [isHolidayCalendarOpen, setIsHolidayCalendarOpen] = useState(false);
   // 显卡天梯图模态框状态
   const [isGPUTierChartOpen, setIsGPUTierChartOpen] = useState(false);
+  // 今日热榜模态框状态
+  const [isHotBoardOpen, setIsHotBoardOpen] = useState(false);
+  // 贪吃蛇游戏状态
+  const [isSnakeGameOpen, setIsSnakeGameOpen] = useState(false);
+  // 贪吃蛇彩蛋提示
+  const [showSnakeHint, setShowSnakeHint] = useState(false);
   // 屏幕录制模态框状态
   const [isScreenRecorderOpen, setIsScreenRecorderOpen] = useState(false);
   // 安全软件模态框状态
@@ -108,9 +117,30 @@ export default function Home() {
   // 检测是否有任何模态框打开（用于隐藏底部元素）
   const isAnyModalOpen = isStudyModalOpen || isMovieModalOpen || isTimeCapsuleModalOpen || 
     isAIToolsModalOpen || isOtherModalOpen || isUtilityModalOpen || isFeedbackModalOpen || 
-    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen || isGPUTierChartOpen || 
+    isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen || isGPUTierChartOpen || isHotBoardOpen ||
     isScreenRecorderOpen || isSecuritySoftwareOpen || isInputMethodOpen || isOfficeSoftwareOpen || isOtherToolsModalOpen ||
-    isScreenshotToolOpen || isCompressionToolOpen || isVideoPlayerOpen || isSystemCleanerOpen || isDesktopBeautifyOpen;
+    isScreenshotToolOpen || isCompressionToolOpen || isVideoPlayerOpen || isSystemCleanerOpen || isDesktopBeautifyOpen || isSnakeGameOpen;
+
+  // 监听方向键打开贪吃蛇游戏
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 如果游戏已经打开或提示正在显示，不处理（让游戏组件自己处理方向键）
+      if (isSnakeGameOpen || showSnakeHint) return;
+      
+      // 检测方向键，先显示提示再启动游戏
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        setShowSnakeHint(true);
+        // 1.5秒后关闭提示并打开游戏
+        setTimeout(() => {
+          setShowSnakeHint(false);
+          setIsSnakeGameOpen(true);
+        }, 1500);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSnakeGameOpen, showSnakeHint]);
   
 
   
@@ -908,6 +938,7 @@ export default function Home() {
 
              { id: 11, title: '假期日历', icon: 'fa-solid fa-calendar-days', url: '#' },
              { id: 12, title: '天梯图', icon: 'fa-solid fa-chart-line', url: '#' },
+             { id: 13, title: '今日热榜', icon: 'fa-solid fa-fire', url: '#' },
              { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
        ];
       
@@ -1025,7 +1056,7 @@ const socialItems: SocialItem[] = [
   
          {/* 搜索框 - 位于欢迎消息下方 */}
          <div 
-           className="relative z-10 bg-black/40 backdrop-blur-md py-1.5 px-4 border-b border-white/10 cursor-pointer group"
+           className="search-container relative z-10 bg-black/40 backdrop-blur-md py-1.5 px-4 border-b border-white/10 cursor-pointer group"
            onClick={() => window.location.href = 'https://lyjysearch.netlify.app'}
          >
            <div className="container mx-auto flex items-center justify-center">
@@ -1044,8 +1075,8 @@ const socialItems: SocialItem[] = [
          {/* 主内容区 */}
          <main className="relative z-10 flex-grow container mx-auto px-4 py-12 flex flex-col md:flex-row items-center justify-center md:justify-between max-w-5xl">
          {/* 左侧：头像和名称 */}
-         <div className="flex flex-col items-center md:items-start mb-10 md:mb-0 md:mr-10">
-           <div className="relative mb-6">
+         <div className="left-content-area flex flex-col items-center md:items-start mb-10 md:mb-0 md:mr-10">
+           <div className="avatar-container relative mb-6 flex items-center gap-5">
              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
                 <img 
                    src="https://lf-code-agent.coze.cn/obj/x-ai-cn/268624684546/attachment/49a4d7337146cc652592d861806afccf_20250804153303.jpg" 
@@ -1053,8 +1084,17 @@ const socialItems: SocialItem[] = [
                    className="w-full h-full object-cover rounded-full opacity-80"
                  />
              </div>
+             {/* 艺术字标题 */}
+             <h1 
+               className="text-5xl md:text-6xl text-white select-none"
+               style={{ 
+                 textShadow: '0 2px 15px rgba(255,255,255,0.3)',
+                 letterSpacing: '0.05em'
+               }}
+             >
+               𝓁𝓎𝒿𝓎
+             </h1>
            </div>
-             <h1 className="text-3xl md:text-4xl font-light text-white tracking-wider mb-2">lyjy的小站~</h1>
               <div className="hidden">
                 {/* 已移至顶部的模态框状态 */}
               </div>
@@ -1062,7 +1102,7 @@ const socialItems: SocialItem[] = [
            {/* 简介/引用区域 */}
              {/* 名言区域 - 可点击切换 */}
              <div 
-               className="mt-8 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 max-w-md w-full cursor-pointer hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02]"
+               className="quote-container mt-8 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 max-w-md w-full cursor-pointer hover:bg-white/15 transition-all duration-300 transform hover:scale-[1.02]"
                onClick={fetchQuote}
                title="点击切换名言"
              >
@@ -1077,7 +1117,7 @@ const socialItems: SocialItem[] = [
          </div>
  
          {/* 右侧：日期时间和链接 */}
-         <div className="w-full md:w-auto">
+         <div className="right-content-area w-full md:w-auto">
             <div className="grid grid-cols-1 gap-4 mb-8">
               {/* 日期时间卡片 */}
               <div className="bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 w-full shadow-md">
@@ -1086,7 +1126,9 @@ const socialItems: SocialItem[] = [
                     <p className="text-white/70 text-sm mb-1">{currentDate}</p>
                     <p className="text-white text-3xl font-mono font-light">{formatTime(currentTime)}</p>
                   </div>
-                  <MusicPlayer />
+                  <div className="music-player">
+                    <MusicPlayer />
+                  </div>
                 </div>
               </div>
            </div>
@@ -1103,7 +1145,7 @@ const socialItems: SocialItem[] = [
                   <a 
                     key={link.id}
                     href={link.url}
-                     className={`group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
+                     className={`feature-button group bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 hover:bg-white/20 transition-all duration-300 flex flex-col items-center justify-center shadow-md hover:shadow-lg hover:scale-105`}
                       aria-label={link.title}
                         onClick={(e) => {
                           e.preventDefault();
@@ -1119,6 +1161,9 @@ const socialItems: SocialItem[] = [
                             } else if (link.id === 12) {
                               // 打开显卡天梯图模态框
                               setIsGPUTierChartOpen(true);
+                            } else if (link.id === 13) {
+                              // 打开今日热榜模态框
+                              setIsHotBoardOpen(true);
                             } else if (link.id === 4) {
                              setIsStudyModalOpen(true);
                            } else if (link.id === 7) {
@@ -1260,6 +1305,22 @@ const socialItems: SocialItem[] = [
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
                              <div className="w-3 h-10 bg-green-500 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2026.3.23 更新 v3.3</h4>
+                           </div>
+                           <ul className="ml-7 space-y-2 text-white/70">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>新增了彩蛋2--贪吃蛇，不过怎么开启请自行发掘</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>新增了今日热榜功能</span>
+                             </li>
+                           </ul>
+                         </div>
+                         <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
                              <h4 className="text-lg font-semibold text-white">2026.3.21 更新 v3.2</h4>
                            </div>
                            <ul className="ml-7 space-y-2 text-white/70">
@@ -1902,9 +1963,62 @@ const socialItems: SocialItem[] = [
                 onClose={() => setIsGPUTierChartOpen(false)} 
               />
 
+              {/* 今日热榜模态框 */}
+              <HotBoard
+                isOpen={isHotBoardOpen}
+                onClose={() => setIsHotBoardOpen(false)}
+              />
+
+              {/* 贪吃蛇彩蛋提示 */}
+              <AnimatePresence>
+                {showSnakeHint && (
+                  <motion.div
+                    className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <motion.div
+                      className="bg-black/80 backdrop-blur-md px-12 py-8 rounded-2xl border border-green-500/30 shadow-2xl"
+                      initial={{ scale: 0.8, y: 20 }}
+                      animate={{ scale: 1, y: 0 }}
+                      exit={{ scale: 0.8, y: 20 }}
+                      transition={{ type: "spring", damping: 20 }}
+                    >
+                      <div className="flex items-center gap-4 mb-4">
+                        <motion.div
+                          animate={{ rotate: [0, 10, -10, 0] }}
+                          transition={{ duration: 0.5, repeat: 2 }}
+                          className="text-5xl"
+                        >
+                          🐍
+                        </motion.div>
+                        <div>
+                          <p className="text-2xl font-bold text-green-400">彩蛋二</p>
+                          <p className="text-white/80 text-lg">贪吃蛇游戏</p>
+                        </div>
+                      </div>
+                      <motion.div
+                        className="h-1 bg-green-500 rounded-full overflow-hidden"
+                        initial={{ width: 0 }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 1.5, ease: "linear" }}
+                      />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* 贪吃蛇游戏 */}
+              <SnakeGame
+                isOpen={isSnakeGameOpen}
+                onClose={() => setIsSnakeGameOpen(false)}
+              />
+
                {/* 左下角版本号 - 与版本动画无缝衔接 */}
    <div 
-     className={`fixed bottom-6 left-6 text-4xl font-black transform -rotate-12 z-20 transition-all duration-500 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+     className={`version-badge fixed bottom-6 left-6 text-4xl font-black transform -rotate-12 z-20 transition-all duration-500 ${isAnyModalOpen && !isSnakeGameOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
      style={{
        background: 'linear-gradient(to right, #fb923c, #fcd34d, #fb923c)',
        WebkitBackgroundClip: 'text',
@@ -1913,7 +2027,7 @@ const socialItems: SocialItem[] = [
        textShadow: '0 0 20px rgba(251, 146, 60, 0.5)',
      }}
    >
-     V3.2
+     V3.3
    </div>
 
             {/* 意见反馈弹窗 */}
@@ -2016,26 +2130,26 @@ const socialItems: SocialItem[] = [
           {/* 更新日志按钮 - 右下角固定位置 */}
            <button 
   onClick={() => window.open('https://lyjy.netlify.app', '_blank')}
-  className={`fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+  className={`social-link fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110 ${isAnyModalOpen && !isSnakeGameOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
   aria-label="访问lyjy.netlify.app"
 >
   <i className="fa-solid fa-paper-plane"></i>
 </button>
            <button 
   onClick={() => setIsUpdateLogOpen(true)}
-  className={`fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+  className={`social-link fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-50 transition-all duration-300 hover:scale-110 ${isAnyModalOpen && !isSnakeGameOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
   aria-label="查看更新日志"
 >
   <i className="fa-solid fa-history"></i>
 </button>
 
-          <footer className={`relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm transition-all duration-300 ${isAnyModalOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <footer className={`footer-container relative z-10 bg-black/40 text-white py-6 px-4 backdrop-blur-sm transition-all duration-300 ${isAnyModalOpen && !isSnakeGameOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <div className="container mx-auto flex justify-center space-x-6">
              {socialItems.map(item => (
                  <a 
                    key={item.id}
                    href={item.url}
-                   className="text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
+                   className="social-link text-white/60 hover:text-white transition-colors hover:scale-110 duration-300"
                    aria-label={item.name}
                    target={item.name === '抖音' || item.name === 'GitHub' ? '_blank' : undefined}
                    rel={(item.name === '抖音' || item.name === 'GitHub') ? 'noopener noreferrer' : undefined}
