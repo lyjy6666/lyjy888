@@ -17,6 +17,10 @@ import SystemCleaner from '@/components/SystemCleaner';
 import DesktopBeautify from '@/components/DesktopBeautify';
 import HotBoard from '@/components/HotBoard';
 import SnakeGame from '@/components/SnakeGame';
+import PomodoroTimer from '@/components/PomodoroTimer';
+import RandomDecision from '@/components/RandomDecision';
+import PersonalProfile from '@/components/PersonalProfile';
+import Guestbook from '@/components/Guestbook';
 
 // 定义链接数据类型
 interface LinkItem {
@@ -113,13 +117,21 @@ export default function Home() {
   const [isSystemCleanerOpen, setIsSystemCleanerOpen] = useState(false);
   // 桌面美化工具模态框状态
   const [isDesktopBeautifyOpen, setIsDesktopBeautifyOpen] = useState(false);
+  // 番茄钟模态框状态
+  const [isPomodoroTimerOpen, setIsPomodoroTimerOpen] = useState(false);
+  // 随机决策器模态框状态
+  const [isRandomDecisionOpen, setIsRandomDecisionOpen] = useState(false);
+  // 个人展示页状态
+  const [isPersonalProfileOpen, setIsPersonalProfileOpen] = useState(false);
+  // 留言板模态框状态
+  const [isGuestbookOpen, setIsGuestbookOpen] = useState(false);
   
   // 检测是否有任何模态框打开（用于隐藏底部元素）
   const isAnyModalOpen = isStudyModalOpen || isMovieModalOpen || isTimeCapsuleModalOpen || 
     isAIToolsModalOpen || isOtherModalOpen || isUtilityModalOpen || isFeedbackModalOpen || 
     isPortalWarningOpen || isUpdateLogOpen || isHolidayCalendarOpen || isGPUTierChartOpen || isHotBoardOpen ||
     isScreenRecorderOpen || isSecuritySoftwareOpen || isInputMethodOpen || isOfficeSoftwareOpen || isOtherToolsModalOpen ||
-    isScreenshotToolOpen || isCompressionToolOpen || isVideoPlayerOpen || isSystemCleanerOpen || isDesktopBeautifyOpen || isSnakeGameOpen;
+    isScreenshotToolOpen || isCompressionToolOpen || isVideoPlayerOpen || isSystemCleanerOpen || isDesktopBeautifyOpen || isSnakeGameOpen || isPomodoroTimerOpen || isRandomDecisionOpen || isGuestbookOpen;
 
   // 监听方向键打开贪吃蛇游戏
   useEffect(() => {
@@ -939,6 +951,9 @@ export default function Home() {
              { id: 11, title: '假期日历', icon: 'fa-solid fa-calendar-days', url: '#' },
              { id: 12, title: '天梯图', icon: 'fa-solid fa-chart-line', url: '#' },
              { id: 13, title: '今日热榜', icon: 'fa-solid fa-fire', url: '#' },
+             { id: 14, title: '番茄钟', icon: 'fa-solid fa-clock', url: '#' },
+             { id: 15, title: '随机决策', icon: 'fa-solid fa-dice', url: '#' },
+             { id: 16, title: '留言板', icon: 'fa-solid fa-comments', url: '#' },
              { id: 10, title: '其他', icon: 'fa-solid fa-ellipsis-h', url: '#' },
        ];
       
@@ -1077,12 +1092,20 @@ const socialItems: SocialItem[] = [
          {/* 左侧：头像和名称 */}
          <div className="left-content-area flex flex-col items-center md:items-start mb-10 md:mb-0 md:mr-10">
            <div className="avatar-container relative mb-6 flex items-center gap-5">
-             <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg">
+             <div 
+               onClick={() => setIsPersonalProfileOpen(true)}
+               className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg cursor-pointer hover:scale-105 hover:border-white/40 transition-all duration-300 group"
+               title="点击查看个人展示页"
+             >
                 <img 
                    src="https://lf-code-agent.coze.cn/obj/x-ai-cn/268624684546/attachment/49a4d7337146cc652592d861806afccf_20250804153303.jpg" 
                    alt="Avatar" 
-                   className="w-full h-full object-cover rounded-full opacity-80"
+                   className="w-full h-full object-cover rounded-full opacity-80 group-hover:opacity-100 transition-opacity"
                  />
+                {/* 悬停提示 */}
+                <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                  <i className="fa-solid fa-user text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
+                </div>
              </div>
              {/* 艺术字标题 */}
              <h1 
@@ -1116,8 +1139,17 @@ const socialItems: SocialItem[] = [
              </div>
          </div>
  
-         {/* 右侧：日期时间和链接 */}
+         {/* 右侧：日期时间和链接 / 个人展示页 */}
          <div className="right-content-area w-full md:w-auto">
+          <AnimatePresence mode="wait">
+            {!isPersonalProfileOpen ? (
+              <motion.div
+                key="main-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.3 }}
+              >
             <div className="grid grid-cols-1 gap-4 mb-8">
               {/* 日期时间卡片 */}
               <div className="bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/10 w-full shadow-md">
@@ -1164,6 +1196,15 @@ const socialItems: SocialItem[] = [
                             } else if (link.id === 13) {
                               // 打开今日热榜模态框
                               setIsHotBoardOpen(true);
+                            } else if (link.id === 14) {
+                              // 打开番茄钟模态框
+                              setIsPomodoroTimerOpen(true);
+                            } else if (link.id === 15) {
+                              // 打开随机决策器模态框
+                              setIsRandomDecisionOpen(true);
+                            } else if (link.id === 16) {
+                              // 打开留言板模态框
+                              setIsGuestbookOpen(true);
                             } else if (link.id === 4) {
                              setIsStudyModalOpen(true);
                            } else if (link.id === 7) {
@@ -1183,7 +1224,12 @@ const socialItems: SocialItem[] = [
                       }}
                   >
                     <i className={`${link.icon} text-white/80 text-xl mb-2 group-hover:text-white transition-colors`}></i>
-                    <span className="text-white/80 text-sm group-hover:text-white transition-colors">{link.title}</span>
+                    <span className="text-white/80 text-sm group-hover:text-white transition-colors flex items-center gap-1">
+                      {link.title}
+                      {link.id === 16 && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-medium bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full">Beta</span>
+                      )}
+                    </span>
                   </a>
                 ))}
               </div>
@@ -1191,27 +1237,33 @@ const socialItems: SocialItem[] = [
                {/* 分页按钮 - 移到假期日历下 */}
                {totalPages > 1 && (
                  <div className="mt-8 flex justify-center">
-                   <div className="relative w-1/2 bg-white/20 h-1 rounded-full cursor-pointer">
-                     <button
-                       onClick={() => handlePageChange(1)}
-                       className={`absolute left-0 top-0 h-full w-1/2 transition-all duration-300 ${
-                         currentPage === 1 ? 'bg-white/40 rounded-l-full' : 'hover:bg-white/30 rounded-l-full'
-                       }`}
-                       aria-label="第一页"
-                     ></button>
-                     <div className="absolute left-1/2 top-0 bottom-0 w-px bg-black/30"></div>
-                     <button
-                       onClick={() => handlePageChange(2)}
-                       className={`absolute right-0 top-0 h-full w-1/2 transition-all duration-300 ${
-                         currentPage === 2 ? 'bg-white/40 rounded-r-full' : 'hover:bg-white/30 rounded-r-full'
-                       }`}
-                       aria-label="第二页"
-                     ></button>
+                   <div className="relative w-1/2 bg-white/20 h-1 rounded-full cursor-pointer flex">
+                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page, index) => (
+                       <button
+                         key={page}
+                         onClick={() => handlePageChange(page)}
+                         className={`h-full transition-all duration-300 ${
+                           currentPage === page ? 'bg-white/40' : 'hover:bg-white/30'
+                         } ${
+                           index === 0 ? 'rounded-l-full' : ''
+                         } ${
+                           index === totalPages - 1 ? 'rounded-r-full' : ''
+                         }`}
+                         style={{ width: `${100 / totalPages}%` }}
+                         aria-label={`第${page}页`}
+                       ></button>
+                     ))}
                    </div>
                  </div>
                )}
-            
-            {/* 电影网站选择模态框 */}
+              </motion.div>
+            ) : (
+              <PersonalProfile 
+                isOpen={isPersonalProfileOpen} 
+                onClose={() => setIsPersonalProfileOpen(false)} 
+              />
+            )}
+          </AnimatePresence>
             {isMovieModalOpen && (
               <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 {/* 背景遮罩 */}
@@ -1305,6 +1357,30 @@ const socialItems: SocialItem[] = [
                         <div className="mb-8">  
                            <div className="flex items-center mb-3">
                              <div className="w-3 h-10 bg-green-500 rounded-l mr-4"></div>
+                             <h4 className="text-lg font-semibold text-white">2026.4.1 更新 v3.4</h4>
+                           </div>
+                           <ul className="ml-7 space-y-2 text-white/70">
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>新增番茄钟功能</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>新增随机决策器功能</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>新增留言板功能（Beta测试版）</span>
+                             </li>
+                             <li className="flex items-start">
+                               <i className="fa-solid fa-circle text-xs mt-1.5 mr-2 text-white/50"></i>
+                               <span>修复了一些已知问题</span>
+                             </li>
+                           </ul>
+                         </div>
+                        <div className="mb-8">  
+                           <div className="flex items-center mb-3">
+                             <div className="w-3 h-10 bg-gray-400 rounded-l mr-4"></div>
                              <h4 className="text-lg font-semibold text-white">2026.3.23 更新 v3.3</h4>
                            </div>
                            <ul className="ml-7 space-y-2 text-white/70">
@@ -2016,6 +2092,24 @@ const socialItems: SocialItem[] = [
                 onClose={() => setIsSnakeGameOpen(false)}
               />
 
+              {/* 番茄钟 */}
+              <PomodoroTimer
+                isOpen={isPomodoroTimerOpen}
+                onClose={() => setIsPomodoroTimerOpen(false)}
+              />
+
+              {/* 随机决策器 */}
+              <RandomDecision
+                isOpen={isRandomDecisionOpen}
+                onClose={() => setIsRandomDecisionOpen(false)}
+              />
+
+              {/* 留言板 */}
+              <Guestbook
+                isOpen={isGuestbookOpen}
+                onClose={() => setIsGuestbookOpen(false)}
+              />
+
                {/* 左下角版本号 - 与版本动画无缝衔接 */}
    <div 
      className={`version-badge fixed bottom-6 left-6 text-4xl font-black transform -rotate-12 z-20 transition-all duration-500 ${isAnyModalOpen && !isSnakeGameOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -2027,7 +2121,7 @@ const socialItems: SocialItem[] = [
        textShadow: '0 0 20px rgba(251, 146, 60, 0.5)',
      }}
    >
-     V3.3
+     V3.4
    </div>
 
             {/* 意见反馈弹窗 */}

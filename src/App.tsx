@@ -21,9 +21,11 @@ export default function App() {
   };
 
   // 加载完成后显示版本动画
+  // 暂时禁用开场动画，直接显示主页面（V4.0时可重新启用）
   const handleLoadingComplete = useCallback(() => {
     setIsLoading(false);
-    setShowVersionAnimation(true);
+    // setShowVersionAnimation(true); // 暂时注释，跳过版本动画
+    setIsReady(true); // 直接显示主页面
   }, []);
 
   // 版本动画完成后显示主页面
