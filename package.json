@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@supabase/supabase-js": "^2.106.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.0.0",
     "react": "^18.2.0",
@@ -26,11 +27,10 @@
   "name": "project_template_react",
   "private": true,
   "scripts": {
-    "build": "bash ./scripts/build.sh",
-    "dev": "bash ./scripts/dev.sh",
+    "build": "vite build",
+    "dev": "vite --port 5000",
     "lint": "eslint",
-    "preinstall": "npx only-allow pnpm",
-    "start": "bash ./scripts/start.sh",
+    "start": "vite --port 5000",
     "ts-check": "tsc -p tsconfig.json"
   },
   "type": "module",

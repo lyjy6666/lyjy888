@@ -5,6 +5,7 @@ import { AuthContext } from '@/contexts/authContext';
 import Loading from '@/components/Loading';
 import VersionAnimation from '@/components/VersionAnimation';
 import CustomCursor from '@/components/CustomCursor';
+import ShutdownNotice from '@/components/ShutdownNotice';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
   const [showVersionAnimation, setShowVersionAnimation] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const [showShutdownNotice, setShowShutdownNotice] = useState(true);
   const keySequence = useRef('');
   const easterEggTriggered = useRef(false);
 
@@ -20,49 +22,55 @@ export default function App() {
     setIsAuthenticated(false);
   };
 
-  // 加载完成后显示版本动画
-  // 暂时禁用开场动画，直接显示主页面（V4.0时可重新启用）
-  const handleLoadingComplete = useCallback(() => {
-    setIsLoading(false);
-    // setShowVersionAnimation(true); // 暂时注释，跳过版本动画
-    setIsReady(true); // 直接显示主页面
+  useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem('shutdown_notice_dismissed');
+      if (dismissed === '1') {
+        setShowShutdownNotice(false);
+      }
+    } catch (e) {}
   }, []);
 
-  // 版本动画完成后显示主页面
+  const handleShutdownDismiss = () => {
+    try {
+      localStorage.setItem('shutdown_notice_dismissed', '1');
+    } catch (e) {}
+    setShowShutdownNotice(false);
+  };
+
+  const handleLoadingComplete = useCallback(() => {
+    setIsLoading(false);
+    setIsReady(true);
+  }, []);
+
   const handleVersionAnimationComplete = useCallback(() => {
     setShowVersionAnimation(false);
     setIsReady(true);
   }, []);
 
-  // 模拟加载过程
   useEffect(() => {
     const timer = setTimeout(() => {
       handleLoadingComplete();
-    }, 3500); // 3.5秒加载时间
+    }, 3500);
 
     return () => clearTimeout(timer);
   }, [handleLoadingComplete]);
 
-  // 彩蛋键盘监听 - LYJY
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toUpperCase();
       
-      // 只追踪字母
       if (/^[A-Z]$/.test(key)) {
         keySequence.current += key;
         
-        // 只保留最后4个字符
         if (keySequence.current.length > 4) {
           keySequence.current = keySequence.current.slice(-4);
         }
         
-        // 检测彩蛋
         if (keySequence.current === 'LYJY' && !easterEggTriggered.current) {
           easterEggTriggered.current = true;
           setShowEasterEgg(true);
           
-          // 5秒后自动关闭
           setTimeout(() => {
             setShowEasterEgg(false);
           }, 5000);
@@ -85,8 +93,12 @@ export default function App() {
       {showVersionAnimation && (
         <VersionAnimation onComplete={handleVersionAnimationComplete} />
       )}
+
+      {showShutdownNotice && !isLoading && (
+        <ShutdownNotice onEnter={handleShutdownDismiss} />
+      )}
       
-      {isReady && (
+      {isReady && !showShutdownNotice && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -99,7 +111,6 @@ export default function App() {
         </motion.div>
       )}
 
-      {/* 彩蛋弹窗 */}
       <AnimatePresence>
         {showEasterEgg && (
           <motion.div

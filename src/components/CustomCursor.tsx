@@ -12,7 +12,6 @@ export default function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // 检测是否悬停在可交互元素上
       if (
         target.tagName === 'BUTTON' ||
         target.tagName === 'A' ||
@@ -37,10 +36,8 @@ export default function CustomCursor() {
       setIsMouseDown(false);
     };
 
-    // 隐藏默认鼠标光标
     document.body.style.cursor = 'none';
 
-    // 创建全局样式来强制隐藏所有元素的光标
     const styleElement = document.createElement('style');
     styleElement.innerHTML = `
       * {
@@ -66,9 +63,8 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* 外圈 - 白色半透明圆，点击时消失 */}
       <div
-        className={`fixed pointer-events-none z-[9999] rounded-full bg-white/30 transition-all duration-150 ease-out ${isMouseDown ? 'opacity-0 scale-0' : 'opacity-100 scale-100'}`}
+        className={`fixed pointer-events-none z-[2147483647] rounded-full bg-white/30 transition-all duration-150 ease-out ${isMouseDown ? 'opacity-0 scale-0' : 'opacity-100 scale-100'}`}
         style={{
           left: position.x,
           top: position.y,
@@ -77,10 +73,8 @@ export default function CustomCursor() {
           transform: 'translate(-50%, -50%)',
         }}
       />
-
-      {/* 内圈 - 白色实心圆 */}
       <div
-        className="fixed pointer-events-none z-[9999] rounded-full bg-white transition-transform duration-75 ease-out"
+        className="fixed pointer-events-none z-[2147483647] rounded-full bg-white transition-transform duration-75 ease-out"
         style={{
           left: position.x,
           top: position.y,
