@@ -1,11 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
-import cloudIDEReactRefresh from '@coze-arch/vite-plugin-react-refresh-cloudide';
-
 
 function getPlugins() {
-  const plugins = [cloudIDEReactRefresh(),react(), tsconfigPaths()];
+  const plugins = [react(), tsconfigPaths()];
   return plugins;
 }
 
